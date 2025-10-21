@@ -8,9 +8,27 @@ import (
 	"time"
 )
 
+// CORS middleware
+func enableCORS(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Разрешаем все origins для разработки
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+
+		// Обработка preflight OPTIONS запросов
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next(w, r)
+	}
+}
+
 func main() {
-	// Health check endpoint - ДОЛЖЕН БЫТЬ ПЕРЕД корневым маршрутом
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	// Health check endpoint
+	http.HandleFunc("/health", enableCORS(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Health check requested from %s", r.RemoteAddr)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -18,10 +36,10 @@ func main() {
 			"timestamp": time.Now().Format(time.RFC3339),
 			"service":   "paydeya-backend",
 		})
-	})
+	}))
 
 	// API endpoints
-	http.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/", enableCORS(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("API request: %s", r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -29,13 +47,12 @@ func main() {
 			"timestamp": time.Now().Format(time.RFC3339),
 			"endpoint":  r.URL.Path,
 		})
-	})
+	}))
 
-	// Root endpoint - ДОЛЖЕН БЫТЬ ПОСЛЕДНИМ
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	// Root endpoint
+	http.HandleFunc("/", enableCORS(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Root request: %s", r.URL.Path)
 
-		// Если запрос не к корню, покажем 404
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
@@ -50,7 +67,7 @@ func main() {
 			},
 			"timestamp": time.Now().Format(time.RFC3339),
 		})
-	})
+	}))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -62,6 +79,7 @@ func main() {
 	log.Printf("   GET /")
 	log.Printf("   GET /health")
 	log.Printf("   GET /api/*")
+	log.Printf("🌐 CORS enabled for all origins")
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
