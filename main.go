@@ -1,65 +1,67 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 	"time"
 )
 
-func enableCORS(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+func main() {
+	// Health check endpoint - ДОЛЖЕН БЫТЬ ПЕРЕД корневым маршрутом
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Health check requested from %s", r.RemoteAddr)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":    "ok",
+			"timestamp": time.Now().Format(time.RFC3339),
+			"service":   "paydeya-backend",
+		})
+	})
 
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
+	// API endpoints
+	http.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("API request: %s", r.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"message":   "Paydeya API is running! 🚀",
+			"timestamp": time.Now().Format(time.RFC3339),
+			"endpoint":  r.URL.Path,
+		})
+	})
+
+	// Root endpoint - ДОЛЖЕН БЫТЬ ПОСЛЕДНИМ
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Root request: %s", r.URL.Path)
+
+		// Если запрос не к корню, покажем 404
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
 			return
 		}
 
-		next(w, r)
-	}
-}
-
-func main() {
-	// Health check endpoint
-	http.HandleFunc("/health", enableCORS(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"status":"ok","timestamp":"` + time.Now().Format(time.RFC3339) + `"}`))
-	}))
-
-	// API endpoints
-	http.HandleFunc("/api/", enableCORS(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		response := map[string]string{
-			"message":   "Paydeya API is running! 🚀",
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"message": "Welcome to Paydeya API",
+			"endpoints": []string{
+				"GET /health",
+				"GET /api/",
+			},
 			"timestamp": time.Now().Format(time.RFC3339),
-			"version":   "1.0.0",
-		}
-		fmt.Fprintf(w, `{"message":"%s","timestamp":"%s","version":"%s"}`,
-			response["message"], response["timestamp"], response["version"])
-	}))
+		})
+	})
 
-	// Root endpoint
-	http.HandleFunc("/", enableCORS(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"message":"Welcome to Paydeya API","endpoints":["/health","/api/"]}`))
-	}))
-
-	// Get port from environment variable (Render sets this automatically)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	// Start server
-	log.Printf("🚀 Paydeya backend server starting on port %s", port)
-	log.Printf("📊 Health check: http://localhost:%s/health", port)
-	log.Printf("🔗 API: http://localhost:%s/api/", port)
+	log.Printf("🚀 Server starting on port %s", port)
+	log.Printf("📊 Endpoints:")
+	log.Printf("   GET /")
+	log.Printf("   GET /health")
+	log.Printf("   GET /api/*")
 
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatalf("❌ Failed to start server: %v", err)
-	}
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
