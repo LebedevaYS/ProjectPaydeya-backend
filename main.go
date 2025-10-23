@@ -11,6 +11,7 @@ import (
     "paydeya-backend/internal/repositories"
     "paydeya-backend/internal/services"
 
+
     "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
 )
@@ -79,6 +80,10 @@ func main() {
     {
         auth.POST("/register", authHandler.Register)
         auth.POST("/login", authHandler.Login)
+        auth.POST("/refresh", authHandler.Refresh)
+        auth.POST("/logout", authHandler.Logout)
+        auth.POST("/forgot-password", authHandler.ForgotPassword)
+        auth.POST("/reset-password", authHandler.ResetPassword)
     }
 
     port := os.Getenv("PORT")
@@ -93,6 +98,10 @@ func main() {
     log.Printf("   GET /api/v1/users")
     log.Printf("   POST /api/v1/auth/register")
     log.Printf("   POST /api/v1/auth/login")
+    log.Printf("   POST /api/v1/auth/refresh")
+    log.Printf("   POST /api/v1/auth/logout")
+    log.Printf("   POST /api/v1/auth/forgot-password")
+    log.Printf("   POST /api/v1/auth/reset-password")
 
     if err := router.Run(":" + port); err != nil {
         log.Fatalf("❌ Failed to start server: %v", err)

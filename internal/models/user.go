@@ -34,3 +34,12 @@ type AuthResponse struct {
     RefreshToken string `json:"refreshToken,omitempty"`
     User         *User  `json:"user,omitempty"`
 }
+
+type ForgotPasswordRequest struct {
+    Email string `json:"email" binding:"required,email"`
+}
+
+type ResetPasswordRequest struct {
+    Token       string `json:"token" binding:"required"`
+    NewPassword string `json:"newPassword" binding:"required,min=6"`
+}
