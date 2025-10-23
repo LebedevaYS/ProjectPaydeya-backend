@@ -4,15 +4,18 @@ import (
     "context"
     "errors"
     "fmt"
+    "strconv"
 
     "paydeya-backend/internal/models"
     "paydeya-backend/internal/repositories"
+    "paydeya-backend/internal/utils"
 
     "golang.org/x/crypto/bcrypt"
+    "github.com/golang-jwt/jwt/v5"
 )
 
 type AuthService struct {
-    userRepo *repositories.UserRepository
+    userRepo  *repositories.UserRepository
     jwtSecret string
 }
 
@@ -76,9 +79,77 @@ func (s *AuthService) Login(ctx context.Context, req *models.LoginRequest) (*mod
     return user, nil
 }
 
-// Временно - заглушка для генерации токенов
+// GenerateTokens создает access и refresh токены
 func (s *AuthService) GenerateTokens(user *models.User) (string, string, error) {
-    // TODO: Реализовать JWT токены
-    // Пока возвращаем заглушки
-    return "access-token-stub", "refresh-token-stub", nil
+    accessToken, err := utils.GenerateAccessToken(user.ID, user.Email, user.Role, s.jwtSecret)
+    if err != nil {
+        return "", "", fmt.Errorf("error generating access token: %w", err)
+    }
+
+    refreshToken, err := utils.GenerateRefreshToken(user.ID, s.jwtSecret)
+    if err != nil {
+        return "", "", fmt.Errorf("error generating refresh token: %w", err)
+    }
+
+    return accessToken, refreshToken, nil
+}
+
+// ValidateToken проверяет токен
+func (s *AuthService) ValidateToken(tokenString string) (*utils.Claims, error) {
+    return utils.ValidateToken(tokenString, s.jwtSecret)
+}
+
+// RefreshTokens обновляет токены
+func (s *AuthService) RefreshTokens(refreshToken string) (string, string, error) {
+    token, err := jwt.ParseWithClaims(refreshToken, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+        return []byte(s.jwtSecret), nil
+    })
+
+    if err != nil || !token.Valid {
+        return "", "", errors.New("invalid refresh token")
+    }
+
+    claims, ok := token.Claims.(*jwt.RegisteredClaims)
+    if !ok {
+        return "", "", errors.New("invalid token claims")
+    }
+
+    // Получаем userID из subject
+    userIDStr := claims.Subject
+    userID, err := strconv.Atoi(userIDStr)
+    if err != nil {
+        return "", "", errors.New("invalid user ID in token")
+    }
+
+    // Находим пользователя
+    user, err := s.userRepo.GetUserByID(context.Background(), userID)
+    if err != nil || user == nil {
+        return "", "", errors.New("user not found")
+    }
+
+    // Генерируем новые токены
+    return s.GenerateTokens(user)
+}
+
+// ForgotPassword - отправка email с токеном сброса
+func (s *AuthService) ForgotPassword(ctx context.Context, email string) error {
+    // Пока заглушка - в реальности отправили бы email
+    fmt.Printf("📧 Password reset requested for: %s\n", email)
+    fmt.Printf("🔗 Reset token: reset-token-%s\n", email) // временный токен
+    return nil
+}
+
+// ResetPassword - сброс пароля по токену
+func (s *AuthService) ResetPassword(ctx context.Context, token, newPassword string) error {
+    // Пока заглушка - в реальности проверили бы токен в БД
+    fmt.Printf("🔄 Password reset with token: %s\n", token)
+
+    // Хешируем новый пароль
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+    if err != nil {
+        return fmt.Errorf("error hashing password: %w", err)
+    }
+
+    fmt.Printf("✅ New password hash: %s\n", string(hashedPassword))
+    return nil
 }
