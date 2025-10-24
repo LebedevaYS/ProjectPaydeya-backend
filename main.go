@@ -45,7 +45,7 @@ func main() {
     userRepo := repositories.NewUserRepository(database.DB)
     authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
     authHandler := handlers.NewAuthHandler(authService)
-    profileHandler := handlers.NewProfileHandler(authService)
+    profileHandler := handlers.NewProfileHandler(authService, userRepo)
 
     // Настраиваем Gin
     if os.Getenv("GIN_MODE") != "debug" {
