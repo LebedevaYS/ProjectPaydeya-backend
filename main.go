@@ -43,12 +43,16 @@ func main() {
 
     // Создаем репозитории и сервисы
     userRepo := repositories.NewUserRepository(database.DB)
+    materialRepo := repositories.NewMaterialRepository(database.DB)
+    blockRepo := repositories.NewBlockRepository(database.DB)
     authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
     fileService := services.NewFileService("uploads")
+    materialService := services.NewMaterialService(materialRepo, blockRepo)
 
     // Создаем обработчики
     authHandler := handlers.NewAuthHandler(authService)
     profileHandler := handlers.NewProfileHandler(authService, userRepo, fileService)
+    materialHandler := handlers.NewMaterialHandler(materialService)
 
     // Настраиваем Gin
     if os.Getenv("GIN_MODE") != "debug" {
@@ -95,6 +99,12 @@ func main() {
         protected.GET("/profile", profileHandler.GetProfile)
         protected.PATCH("/profile", profileHandler.UpdateProfile)
         protected.POST("/profile/avatar", profileHandler.UploadAvatar)
+
+        protected.POST("/materials", materialHandler.CreateMaterial)
+        protected.GET("/materials", materialHandler.GetUserMaterials)
+        protected.GET("/materials/:id", materialHandler.GetMaterial)
+        protected.PUT("/materials/:id", materialHandler.UpdateMaterial)
+        protected.POST("/materials/:id/publish", materialHandler.PublishMaterial)
     }
 
     port := os.Getenv("PORT")
@@ -113,6 +123,14 @@ func main() {
     log.Printf("   POST /api/v1/auth/logout")
     log.Printf("   POST /api/v1/auth/forgot-password")
     log.Printf("   POST /api/v1/auth/reset-password")
+    log.Printf("   GET /api/v1/profile")
+    log.Printf("   PATCH /api/v1/profile")
+    log.Printf("   POST /api/v1/profile/avatar")
+    log.Printf("   POST /api/v1/materials")
+    log.Printf("   GET /api/v1/materials")
+    log.Printf("   GET /api/v1/materials/:id")
+    log.Printf("   PUT /api/v1/materials/:id")
+    log.Printf("   POST /api/v1/materials/:id/publish")
 
 
     defer func() {

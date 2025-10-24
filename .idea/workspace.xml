@@ -5,11 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="df66fca4-f99a-429a-aae0-8453cf40471b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/services/file_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/handlers/material.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/models/material.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/repositories/block_repository.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/repositories/material_repository.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/services/material_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/migrations/003_create_materials_tables.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/handlers/profile.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/handlers/profile.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/utils/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/utils/jwt.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
