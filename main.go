@@ -68,8 +68,19 @@ func main() {
 
     // Routes
     router.GET("/health", handlers.HealthCheck)
-    router.GET("/api/v1/users", handlers.GetUsersTest(database.DB)) // временный endpoint с подключением к БД
+    //router.GET("/api/v1/users", handlers.GetUsersTest(database.DB)) // временный endpoint с подключением к БД
+    // Временный эндпоинт для теста
+    router.GET("/api/v1/users", func(c *gin.Context) {
+        if database.DB == nil {
+            c.JSON(500, gin.H{"error": "Database not connected"})
+            return
+        }
 
+        c.JSON(200, gin.H{
+            "message": "Database is connected!",
+            "status": "success",
+        })
+    })
 
     auth := router.Group("/api/v1/auth")
     {
