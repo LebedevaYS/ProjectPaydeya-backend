@@ -94,10 +94,6 @@ func (s *AuthService) GenerateTokens(user *models.User) (string, string, error) 
     return accessToken, refreshToken, nil
 }
 
-// ValidateToken проверяет токен
-func (s *AuthService) ValidateToken(tokenString string) (*utils.Claims, error) {
-    return utils.ValidateToken(tokenString, s.jwtSecret)
-}
 
 // RefreshTokens обновляет токены
 func (s *AuthService) RefreshTokens(refreshToken string) (string, string, error) {
@@ -152,4 +148,8 @@ func (s *AuthService) ResetPassword(ctx context.Context, token, newPassword stri
 
     fmt.Printf("✅ New password hash: %s\n", string(hashedPassword))
     return nil
+}
+// ValidateToken проверяет access token
+func (s *AuthService) ValidateToken(tokenString string) (*utils.Claims, error) {
+    return utils.ValidateToken(tokenString, s.jwtSecret)
 }

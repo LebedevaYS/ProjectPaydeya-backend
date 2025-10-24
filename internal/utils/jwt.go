@@ -20,7 +20,7 @@ func GenerateAccessToken(userID int, email, role, secret string) (string, error)
         Email:  email,
         Role:   role,
         RegisteredClaims: jwt.RegisteredClaims{
-            ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)), // 15 минут
+            ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Minute)), // 15 минут
             IssuedAt:  jwt.NewNumericDate(time.Now()),
             Issuer:    "paydeya-backend",
         },

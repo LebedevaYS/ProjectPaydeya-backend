@@ -10,6 +10,7 @@ import (
     "paydeya-backend/internal/handlers"
     "paydeya-backend/internal/repositories"
     "paydeya-backend/internal/services"
+    "paydeya-backend/internal/middleware"
 
 
     "github.com/gin-gonic/gin"
@@ -42,8 +43,9 @@ func main() {
 
     // Создаем репозитории и сервисы
     userRepo := repositories.NewUserRepository(database.DB)
-    authService := services.NewAuthService(userRepo, "your-jwt-secret") // пока используем заглушку
+    authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
     authHandler := handlers.NewAuthHandler(authService)
+    profileHandler := handlers.NewProfileHandler(authService)
 
     // Настраиваем Gin
     if os.Getenv("GIN_MODE") != "debug" {
@@ -79,6 +81,14 @@ func main() {
         auth.POST("/logout", authHandler.Logout)
         auth.POST("/forgot-password", authHandler.ForgotPassword)
         auth.POST("/reset-password", authHandler.ResetPassword)
+    }
+    // Защищенные эндпоинты (требуют авторизацию)
+    protected := router.Group("/api/v1")
+    protected.Use(middleware.AuthMiddleware(authService))
+    {
+        protected.GET("/profile", profileHandler.GetProfile)
+        protected.PATCH("/profile", profileHandler.UpdateProfile)
+        protected.POST("/profile/avatar", profileHandler.UploadAvatar)
     }
 
     port := os.Getenv("PORT")
