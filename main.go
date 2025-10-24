@@ -1,7 +1,7 @@
 package main
 
 import (
-    "context"
+
     "log"
     "os"
     "strconv"
@@ -87,7 +87,7 @@ func main() {
     }
 
     log.Printf("🚀 Server starting on port %s", port)
-    log.Printf("📊 Database: connected (%d users)", userCount)
+    log.Printf("📊 Database connected successfully")
     log.Printf("🌐 Endpoints:")
     log.Printf("   GET /health")
     log.Printf("   GET /api/v1/users")
