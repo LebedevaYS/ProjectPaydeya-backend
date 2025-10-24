@@ -17,9 +17,9 @@ import (
 )
 
 func main() {
-    // Загружаем .env файл
+ // Загружаем .env файл локально
     if err := godotenv.Load(); err != nil {
-        log.Println("⚠️  No .env file found, using default values")
+        log.Println("⚠️  No .env file found, using environment variables")
     }
 
     // Создаем конфиг для БД
@@ -33,17 +33,12 @@ func main() {
 
     // Инициализируем базу данных
     if err := database.Init(dbConfig); err != nil {
-        log.Fatalf("❌ Failed to initialize database: %v", err)
+        log.Printf("❌ Failed to initialize database: %v", err)
+        // НЕ завершаем приложение - возможно мы на Render и БД еще не готова
+    } else {
+        log.Println("✅ Database connected successfully")
     }
     defer database.Close()
-
-    // Проверяем подключение к БД
-    var userCount int
-    err := database.DB.QueryRow(context.Background(), "SELECT COUNT(*) FROM users").Scan(&userCount)
-    if err != nil {
-        log.Fatalf("❌ Unable to query users table: %v", err)
-    }
-    log.Printf("✅ Database connected successfully! Users in DB: %d", userCount)
 
     // Создаем репозитории и сервисы
     userRepo := repositories.NewUserRepository(database.DB)
