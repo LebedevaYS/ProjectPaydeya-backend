@@ -44,8 +44,11 @@ func main() {
     // Создаем репозитории и сервисы
     userRepo := repositories.NewUserRepository(database.DB)
     authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
+    fileService := services.NewFileService("uploads")
+
+    // Создаем обработчики
     authHandler := handlers.NewAuthHandler(authService)
-    profileHandler := handlers.NewProfileHandler(authService, userRepo)
+    profileHandler := handlers.NewProfileHandler(authService, userRepo, fileService)
 
     // Настраиваем Gin
     if os.Getenv("GIN_MODE") != "debug" {
@@ -67,6 +70,9 @@ func main() {
 
         c.Next()
     })
+
+    // Обслуживаем статические файлы (аватары)
+    router.Static("/uploads", "./uploads")
 
     // Routes
     router.GET("/health", handlers.HealthCheck)

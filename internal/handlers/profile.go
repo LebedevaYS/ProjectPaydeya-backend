@@ -2,7 +2,6 @@ package handlers
 
 import (
     "net/http"
-    "strconv"
     "log"
 
     "paydeya-backend/internal/repositories"
@@ -14,12 +13,14 @@ import (
 type ProfileHandler struct {
     authService *services.AuthService
     userRepo    *repositories.UserRepository
+    fileService *services.FileService
 }
 
-func NewProfileHandler(authService *services.AuthService, userRepo *repositories.UserRepository) *ProfileHandler {
+func NewProfileHandler(authService *services.AuthService, userRepo *repositories.UserRepository, fileService *services.FileService) *ProfileHandler {
     return &ProfileHandler{
         authService: authService,
         userRepo:    userRepo,
+        fileService: fileService,
     }
 }
 
@@ -88,17 +89,47 @@ func (h *ProfileHandler) UpdateProfile(c *gin.Context) {
     })
 }
 
+
 // UploadAvatar загружает аватар
 func (h *ProfileHandler) UploadAvatar(c *gin.Context) {
     userID := c.GetInt("userID")
 
-    // Пока заглушка - в реальности сохраняем файл и получаем URL
-    avatarURL := "/avatars/user_" + strconv.Itoa(userID) + ".jpg"
+    // Получаем файл из формы
+    file, err := c.FormFile("avatar")
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Avatar file is required"})
+        return
+    }
+
+    // Проверяем размер файла (макс 5MB)
+    if file.Size > 5*1024*1024 {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "File too large. Maximum size is 5MB"})
+        return
+    }
+
+    // Получаем текущего пользователя чтобы удалить старый аватар
+    user, err := h.userRepo.GetUserByID(c.Request.Context(), userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user data"})
+        return
+    }
+
+    // Сохраняем новый аватар
+    avatarURL, err := h.fileService.SaveAvatar(userID, file)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save avatar: " + err.Error()})
+        return
+    }
+
+    // Удаляем старый аватар если он был
+    if user.AvatarURL != "" {
+        h.fileService.DeleteAvatar(user.AvatarURL)
+    }
 
     // Обновляем аватар в БД
-    err := h.userRepo.UpdateUserAvatar(c.Request.Context(), userID, avatarURL)
+    err = h.userRepo.UpdateUserAvatar(c.Request.Context(), userID, avatarURL)
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update avatar"})
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update avatar in database"})
         return
     }
 
