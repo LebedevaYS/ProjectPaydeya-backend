@@ -98,6 +98,7 @@ func main() {
     blockRepo := repositories.NewBlockRepository(database.DB)
     catalogRepo := repositories.NewCatalogRepository(database.DB)
     progressRepo := repositories.NewProgressRepository(database.DB)
+    adminRepo := repositories.NewAdminRepository(database.DB)
 
     // Создаем сервисы
     authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
@@ -105,6 +106,7 @@ func main() {
     materialService := services.NewMaterialService(materialRepo, blockRepo)
     catalogService := services.NewCatalogService(catalogRepo)
     progressService := services.NewProgressService(progressRepo)
+    adminService := services.NewAdminService(adminRepo)
 
     // Создаем обработчики
     authHandler := handlers.NewAuthHandler(authService)
@@ -112,6 +114,7 @@ func main() {
     materialHandler := handlers.NewMaterialHandler(materialService)
     catalogHandler := handlers.NewCatalogHandler(catalogService)
     progressHandler := handlers.NewProgressHandler(progressService)
+    adminHandler := handlers.NewAdminHandler(adminService)
 
     // Настраиваем Gin
     if os.Getenv("GIN_MODE") != "debug" {
@@ -148,7 +151,7 @@ func main() {
 
     // Routes
     router.GET("/health", handlers.HealthCheck)
-    router.GET("/api/v1/users", handlers.GetUsersTest(database.DB)) // временный endpoint с подключением к БД
+    router.GET("/api/v1/users", handlers.GetUsersTest(database.DB))
 
     auth := router.Group("/api/v1/auth")
     {
@@ -183,6 +186,15 @@ func main() {
             student.GET("/favorites", progressHandler.GetFavorites)
             student.POST("/materials/:id/complete", progressHandler.MarkMaterialComplete)
             student.POST("/materials/:id/favorite", progressHandler.ToggleFavorite)
+        }
+
+        admin := protected.Group("/admin")
+        admin.Use(middleware.AdminMiddleware()) // ← проверка прав администратора
+        {
+            admin.GET("/statistics", adminHandler.GetStatistics)
+            admin.GET("/users", adminHandler.GetUsers)
+            admin.POST("/users/:id/block", adminHandler.BlockUser)
+            admin.POST("/subjects", adminHandler.CreateSubject)
         }
     }
 
@@ -230,6 +242,10 @@ func main() {
     log.Printf("   GET /api/v1/student/favorites")
     log.Printf("   POST /api/v1/student/materials/:id/complete")
     log.Printf("   POST /api/v1/student/materials/:id/favorite")
+    log.Printf("   GET /api/v1/admin/statistics")
+    log.Printf("   GET /api/v1/admin/users")
+    log.Printf("   POST /api/v1/admin/users/:id/block")
+    log.Printf("   POST /api/v1/admin/subjects")
 
     defer func() {
         if database.DB != nil {
