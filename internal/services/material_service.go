@@ -93,3 +93,121 @@ func (s *MaterialService) generateShareURL() string {
     rand.Read(bytes)
     return hex.EncodeToString(bytes)
 }
+
+// AddBlock добавляет блок к материалу
+func (s *MaterialService) AddBlock(ctx context.Context, userID, materialID int, block *models.Block) error {
+    // Проверяем права
+    material, err := s.materialRepo.GetMaterial(ctx, materialID)
+    if err != nil || material == nil {
+        return fmt.Errorf("material not found")
+    }
+    if material.AuthorID != userID {
+        return fmt.Errorf("access denied")
+    }
+
+    // Получаем текущие блоки
+    blocks, err := s.blockRepo.GetBlocks(ctx, materialID)
+    if err != nil {
+        return err
+    }
+
+    // Добавляем новый блок
+    blocks = append(blocks, *block)
+
+    // Сохраняем все блоки
+    return s.blockRepo.SaveBlocks(ctx, materialID, blocks)
+}
+
+// UpdateBlock обновляет блок
+func (s *MaterialService) UpdateBlock(ctx context.Context, userID, materialID int, blockID string, block *models.Block) error {
+    // Проверяем права
+    material, err := s.materialRepo.GetMaterial(ctx, materialID)
+    if err != nil || material == nil {
+        return fmt.Errorf("material not found")
+    }
+    if material.AuthorID != userID {
+        return fmt.Errorf("access denied")
+    }
+
+    // Получаем текущие блоки
+    blocks, err := s.blockRepo.GetBlocks(ctx, materialID)
+    if err != nil {
+        return err
+    }
+
+    // Находим и обновляем блок
+    for i, b := range blocks {
+        if b.ID == blockID {
+            blocks[i] = *block
+            return s.blockRepo.SaveBlocks(ctx, materialID, blocks)
+        }
+    }
+
+    return fmt.Errorf("block not found")
+}
+
+// DeleteBlock удаляет блок
+func (s *MaterialService) DeleteBlock(ctx context.Context, userID, materialID int, blockID string) error {
+    // Проверяем права
+    material, err := s.materialRepo.GetMaterial(ctx, materialID)
+    if err != nil || material == nil {
+        return fmt.Errorf("material not found")
+    }
+    if material.AuthorID != userID {
+        return fmt.Errorf("access denied")
+    }
+
+    // Получаем текущие блоки
+    blocks, err := s.blockRepo.GetBlocks(ctx, materialID)
+    if err != nil {
+        return err
+    }
+
+    // Удаляем блок
+    var newBlocks []models.Block
+    for _, block := range blocks {
+        if block.ID != blockID {
+            newBlocks = append(newBlocks, block)
+        }
+    }
+
+    return s.blockRepo.SaveBlocks(ctx, materialID, newBlocks)
+}
+
+// ReorderBlocks изменяет порядок блоков
+func (s *MaterialService) ReorderBlocks(ctx context.Context, userID, materialID int, blockIDs []string) error {
+    // Проверяем права
+    material, err := s.materialRepo.GetMaterial(ctx, materialID)
+    if err != nil || material == nil {
+        return fmt.Errorf("material not found")
+    }
+    if material.AuthorID != userID {
+        return fmt.Errorf("access denied")
+    }
+
+    // Получаем текущие блоки
+    blocks, err := s.blockRepo.GetBlocks(ctx, materialID)
+    if err != nil {
+        return err
+    }
+
+    // Создаем мапу для быстрого поиска блоков по ID
+    blockMap := make(map[string]models.Block)
+    for _, block := range blocks {
+        blockMap[block.ID] = block
+    }
+
+    // Создаем новые блоки в указанном порядке
+    var newBlocks []models.Block
+    for position, blockID := range blockIDs {
+        block, exists := blockMap[blockID]
+        if !exists {
+            return fmt.Errorf("block not found: %s", blockID)
+        }
+        block.Position = position
+        newBlocks = append(newBlocks, block)
+    }
+
+    // Сохраняем новый порядок
+    return s.blockRepo.SaveBlocks(ctx, materialID, newBlocks)
+}

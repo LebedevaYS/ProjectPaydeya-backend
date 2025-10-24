@@ -157,3 +157,113 @@ func generateUniqueHash() string {
     rand.Read(bytes)
     return hex.EncodeToString(bytes)
 }
+
+// AddBlock добавляет блок к материалу
+func (h *MaterialHandler) AddBlock(c *gin.Context) {
+    userID := c.GetInt("userID")
+    materialID, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid material ID"})
+        return
+    }
+
+    var block models.Block
+    if err := c.ShouldBindJSON(&block); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    err = h.materialService.AddBlock(c.Request.Context(), userID, materialID, &block)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Block added successfully",
+        "blockId": block.ID,
+    })
+}
+
+
+// UpdateBlock обновляет блок
+func (h *MaterialHandler) UpdateBlock(c *gin.Context) {
+    userID := c.GetInt("userID")
+    materialID, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid material ID"})
+        return
+    }
+
+    blockID := c.Param("blockId")
+
+    var block models.Block
+    if err := c.ShouldBindJSON(&block); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    block.ID = blockID
+
+    err = h.materialService.UpdateBlock(c.Request.Context(), userID, materialID, blockID, &block)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Block updated successfully",
+    })
+}
+
+// DeleteBlock удаляет блок
+func (h *MaterialHandler) DeleteBlock(c *gin.Context) {
+    userID := c.GetInt("userID")
+    materialID, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid material ID"})
+        return
+    }
+
+    blockID := c.Param("blockId")
+
+    err = h.materialService.DeleteBlock(c.Request.Context(), userID, materialID, blockID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Block deleted successfully",
+    })
+}
+
+// ReorderBlocks изменяет порядок блоков
+func (h *MaterialHandler) ReorderBlocks(c *gin.Context) {
+    userID := c.GetInt("userID")
+    materialID, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid material ID"})
+        return
+    }
+
+    var req struct {
+        Blocks []string `json:"blocks" binding:"required"`
+    }
+
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    err = h.materialService.ReorderBlocks(c.Request.Context(), userID, materialID, req.Blocks)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Blocks reordered successfully",
+        "newOrder": req.Blocks,
+    })
+}

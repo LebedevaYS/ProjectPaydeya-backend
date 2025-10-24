@@ -1,10 +1,12 @@
 package main
 
 import (
-
+    "context"
     "log"
     "os"
     "strconv"
+    "fmt"
+    "strings"
 
     "paydeya-backend/internal/database"
     "paydeya-backend/internal/handlers"
@@ -16,6 +18,49 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
 )
+
+// Вспомогательные функции для env переменных
+func getEnv(key, defaultValue string) string {
+    if value := os.Getenv(key); value != "" {
+        return value
+    }
+    return defaultValue
+}
+
+func getEnvAsInt(key string, defaultValue int) int {
+    if value := os.Getenv(key); value != "" {
+        if intValue, err := strconv.Atoi(value); err == nil {
+            return intValue
+        }
+    }
+    return defaultValue
+}
+
+// После подключения к БД в main.go
+func runMigrations() error {
+    migrationFiles := []string{
+        "migrations/001_create_users_table.sql",
+        "migrations/002_add_specializations_table.sql",
+        "migrations/003_create_materials_tables.sql",
+    }
+
+    for _, file := range migrationFiles {
+        sql, err := os.ReadFile(file)
+        if err != nil {
+            return fmt.Errorf("failed to read migration %s: %w", file, err)
+        }
+
+        _, err = database.DB.Exec(context.Background(), string(sql))
+        if err != nil {
+            // Игнорируем ошибки "таблица уже существует"
+            if !strings.Contains(err.Error(), "already exists") {
+                return fmt.Errorf("failed to execute migration %s: %w", file, err)
+            }
+        }
+        log.Printf("✅ Migration applied: %s", file)
+    }
+    return nil
+}
 
 func main() {
  // Загружаем .env файл локально
@@ -35,9 +80,13 @@ func main() {
     // Инициализируем базу данных
     if err := database.Init(dbConfig); err != nil {
         log.Printf("❌ Failed to initialize database: %v", err)
-        // НЕ завершаем приложение - возможно мы на Render и БД еще не готова
     } else {
         log.Println("✅ Database connected successfully")
+
+        // ЗАПУСКАЕМ МИГРАЦИИ ТОЛЬКО ЕСЛИ БД ПОДКЛЮЧЕНА ← ДОБАВЬ ЗДЕСЬ
+        if err := runMigrations(); err != nil {
+            log.Printf("⚠️  Migrations failed: %v", err)
+        }
     }
 
 
@@ -105,6 +154,10 @@ func main() {
         protected.GET("/materials/:id", materialHandler.GetMaterial)
         protected.PUT("/materials/:id", materialHandler.UpdateMaterial)
         protected.POST("/materials/:id/publish", materialHandler.PublishMaterial)
+        protected.POST("/materials/:id/blocks", materialHandler.AddBlock)
+        protected.PUT("/materials/:id/blocks/:blockId", materialHandler.UpdateBlock)
+        protected.DELETE("/materials/:id/blocks/:blockId", materialHandler.DeleteBlock)
+        protected.POST("/materials/:id/blocks/reorder", materialHandler.ReorderBlocks)
     }
 
     port := os.Getenv("PORT")
@@ -131,6 +184,10 @@ func main() {
     log.Printf("   GET /api/v1/materials/:id")
     log.Printf("   PUT /api/v1/materials/:id")
     log.Printf("   POST /api/v1/materials/:id/publish")
+    log.Printf("   POST /api/v1/materials/:id/blocks")
+    log.Printf("   PUT /api/v1/materials/:id/blocks/:blockId")
+    log.Printf("   DELETE /api/v1/materials/:id/blocks/:blockId")
+    log.Printf("   POST /api/v1/materials/:id/blocks/reorder")
 
 
     defer func() {
@@ -146,19 +203,3 @@ func main() {
     }
 }
 
-// Вспомогательные функции для env переменных
-func getEnv(key, defaultValue string) string {
-    if value := os.Getenv(key); value != "" {
-        return value
-    }
-    return defaultValue
-}
-
-func getEnvAsInt(key string, defaultValue int) int {
-    if value := os.Getenv(key); value != "" {
-        if intValue, err := strconv.Atoi(value); err == nil {
-            return intValue
-        }
-    }
-    return defaultValue
-}
