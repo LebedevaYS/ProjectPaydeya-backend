@@ -42,6 +42,8 @@ func runMigrations() error {
         "migrations/001_create_users_table.sql",
         "migrations/002_add_specializations_table.sql",
         "migrations/003_create_materials_tables.sql",
+        "migrations/004_add_ratings_table.sql",
+        "migrations/005_create_progress_tables.sql",
     }
 
     for _, file := range migrationFiles {
@@ -90,18 +92,26 @@ func main() {
     }
 
 
-    // Создаем репозитории и сервисы
+    // Создаем репозитории
     userRepo := repositories.NewUserRepository(database.DB)
     materialRepo := repositories.NewMaterialRepository(database.DB)
     blockRepo := repositories.NewBlockRepository(database.DB)
+    catalogRepo := repositories.NewCatalogRepository(database.DB)
+    progressRepo := repositories.NewProgressRepository(database.DB)
+
+    // Создаем сервисы
     authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
     fileService := services.NewFileService("uploads")
     materialService := services.NewMaterialService(materialRepo, blockRepo)
+    catalogService := services.NewCatalogService(catalogRepo)
+    progressService := services.NewProgressService(progressRepo)
 
     // Создаем обработчики
     authHandler := handlers.NewAuthHandler(authService)
     profileHandler := handlers.NewProfileHandler(authService, userRepo, fileService)
     materialHandler := handlers.NewMaterialHandler(materialService)
+    catalogHandler := handlers.NewCatalogHandler(catalogService)
+    progressHandler := handlers.NewProgressHandler(progressService)
 
     // Настраиваем Gin
     if os.Getenv("GIN_MODE") != "debug" {
@@ -124,13 +134,21 @@ func main() {
         c.Next()
     })
 
+    router.GET("/debug/routes", func(c *gin.Context) {
+        routes := router.Routes()
+        var routeInfo []string
+        for _, route := range routes {
+            routeInfo = append(routeInfo, fmt.Sprintf("%s %s", route.Method, route.Path))
+        }
+        c.JSON(200, gin.H{"routes": routeInfo})
+    })
+
     // Обслуживаем статические файлы (аватары)
     router.Static("/uploads", "./uploads")
 
     // Routes
     router.GET("/health", handlers.HealthCheck)
     router.GET("/api/v1/users", handlers.GetUsersTest(database.DB)) // временный endpoint с подключением к БД
-
 
     auth := router.Group("/api/v1/auth")
     {
@@ -158,7 +176,24 @@ func main() {
         protected.PUT("/materials/:id/blocks/:blockId", materialHandler.UpdateBlock)
         protected.DELETE("/materials/:id/blocks/:blockId", materialHandler.DeleteBlock)
         protected.POST("/materials/:id/blocks/reorder", materialHandler.ReorderBlocks)
+
+        student := protected.Group("/student")
+        {
+            student.GET("/progress", progressHandler.GetProgress)
+            student.GET("/favorites", progressHandler.GetFavorites)
+            student.POST("/materials/:id/complete", progressHandler.MarkMaterialComplete)
+            student.POST("/materials/:id/favorite", progressHandler.ToggleFavorite)
+        }
     }
+
+    catalog := router.Group("/api/v1/catalog")
+    {
+        catalog.GET("/materials", catalogHandler.SearchMaterials)
+        catalog.GET("/subjects", catalogHandler.GetSubjects)
+        catalog.GET("/teachers", catalogHandler.SearchTeachers)
+    }
+
+
 
     port := os.Getenv("PORT")
     if port == "" {
@@ -188,7 +223,13 @@ func main() {
     log.Printf("   PUT /api/v1/materials/:id/blocks/:blockId")
     log.Printf("   DELETE /api/v1/materials/:id/blocks/:blockId")
     log.Printf("   POST /api/v1/materials/:id/blocks/reorder")
-
+    log.Printf("   GET /api/v1/catalog/materials")
+    log.Printf("   GET /api/v1/catalog/subjects")
+    log.Printf("   GET /api/v1/catalog/teachers")
+    log.Printf("   GET /api/v1/student/progress")
+    log.Printf("   GET /api/v1/student/favorites")
+    log.Printf("   POST /api/v1/student/materials/:id/complete")
+    log.Printf("   POST /api/v1/student/materials/:id/favorite")
 
     defer func() {
         if database.DB != nil {

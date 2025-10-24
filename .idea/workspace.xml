@@ -5,6 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="df66fca4-f99a-429a-aae0-8453cf40471b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/internal/handlers/catalog.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/handlers/progress.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/models/catalog.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/models/progress.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/repositories/catalog_repository.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/repositories/progress_repository.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/services/catalog_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/services/progress_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/migrations/004_add_ratings_table.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/migrations/005_create_progress_tables.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/handlers/material.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/handlers/material.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/services/material_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/material_service.go" afterDir="false" />
@@ -43,6 +53,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/migrations" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>

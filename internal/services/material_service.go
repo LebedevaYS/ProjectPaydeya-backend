@@ -5,6 +5,7 @@ import (
     "crypto/rand"
     "encoding/hex"
     "fmt"
+    "strconv"
 
     "paydeya-backend/internal/models"
     "paydeya-backend/internal/repositories"
@@ -85,6 +86,37 @@ func (s *MaterialService) UpdateMaterial(ctx context.Context, userID int, materi
     }
 
     return nil
+}
+// PublishMaterial публикует материал
+func (s *MaterialService) PublishMaterial(ctx context.Context, userID, materialID int, req *models.PublishMaterialRequest) (*models.Material, error) {
+    // Получаем материал
+    material, err := s.materialRepo.GetMaterial(ctx, materialID)
+    if err != nil || material == nil {
+        return nil, fmt.Errorf("material not found")
+    }
+
+    // Проверяем права
+    if material.AuthorID != userID {
+        return nil, fmt.Errorf("access denied")
+    }
+
+    // Обновляем статус и доступ
+    material.Status = req.Visibility
+    material.Access = req.Access
+
+    // Генерируем share URL если нужно
+    if req.Access == "link" {
+        material.ShareURL = "/m/" + s.generateShareURL()
+    } else {
+        material.ShareURL = "/material/" + strconv.Itoa(materialID)
+    }
+
+    // Сохраняем изменения
+    if err := s.materialRepo.UpdateMaterial(ctx, material); err != nil {
+        return nil, fmt.Errorf("failed to publish material: %w", err)
+    }
+
+    return material, nil
 }
 
 // generateShareURL генерирует уникальный URL для доступа по ссылке

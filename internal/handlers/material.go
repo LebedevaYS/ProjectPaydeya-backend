@@ -125,7 +125,7 @@ func (h *MaterialHandler) PublishMaterial(c *gin.Context) {
         return
     }
 
-    // Устанавливаем значения по умолчанию если не переданы
+    // Устанавливаем значения по умолчанию
     if req.Visibility == "" {
         req.Visibility = "published"
     }
@@ -133,21 +133,17 @@ func (h *MaterialHandler) PublishMaterial(c *gin.Context) {
         req.Access = "open"
     }
 
-    // TODO: реализовать в сервисе настоящую публикацию
-    // Пока заглушка с генерацией shareUrl
-    shareUrl := "/material/material-" + strconv.Itoa(materialID)
-    if req.Access == "link" {
-        // Генерируем уникальный URL для доступа по ссылке
-        shareUrl = "/m/" + generateUniqueHash()
+    // Вызываем настоящую логику публикации
+    material, err := h.materialService.PublishMaterial(c.Request.Context(), userID, materialID, &req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
     }
 
     c.JSON(http.StatusOK, gin.H{
         "message": "Material published successfully",
-        "materialID": materialID,
-        "userID": userID,
-        "visibility": req.Visibility,
-        "access": req.Access,
-        "shareUrl": shareUrl,
+        "material": material,
+        "shareUrl": material.ShareURL,
     })
 }
 
