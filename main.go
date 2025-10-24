@@ -38,7 +38,7 @@ func main() {
     } else {
         log.Println("✅ Database connected successfully")
     }
-    defer database.Close()
+
 
     // Создаем репозитории и сервисы
     userRepo := repositories.NewUserRepository(database.DB)
@@ -108,6 +108,15 @@ func main() {
     log.Printf("   POST /api/v1/auth/logout")
     log.Printf("   POST /api/v1/auth/forgot-password")
     log.Printf("   POST /api/v1/auth/reset-password")
+
+
+    defer func() {
+        if database.DB != nil {
+            database.Close()
+            log.Println("🔌 Database connection closed")
+        }
+    }()
+
 
     if err := router.Run(":" + port); err != nil {
         log.Fatalf("❌ Failed to start server: %v", err)
