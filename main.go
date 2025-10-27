@@ -261,6 +261,10 @@ func main() {
     log.Printf("   GET /api/v1/admin/users")
     log.Printf("   POST /api/v1/admin/users/:id/block")
     log.Printf("   POST /api/v1/admin/subjects")
+    log.Printf("   POST /api/v1/upload/image")
+    log.Printf("   POST /api/v1/upload/video")
+    log.Printf("   POST /api/v1/embed/video")
+
 
     defer func() {
         if database.DB != nil {
