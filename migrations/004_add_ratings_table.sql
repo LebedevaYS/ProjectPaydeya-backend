@@ -12,9 +12,3 @@ CREATE TABLE IF NOT EXISTS material_ratings (
 -- Индексы
 CREATE INDEX IF NOT EXISTS idx_material_ratings_material_id ON material_ratings(material_id);
 CREATE INDEX IF NOT EXISTS idx_material_ratings_user_id ON material_ratings(user_id);
-
--- Добавляем тестовые рейтинги
-INSERT INTO material_ratings (material_id, user_id, rating) VALUES
-(1, 4, 5),
-(2, 4, 4)
-ON CONFLICT (material_id, user_id) DO NOTHING;

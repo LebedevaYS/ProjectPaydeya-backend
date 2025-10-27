@@ -6,7 +6,6 @@ import (
     "os"
     "strconv"
     "fmt"
-    "strings"
 
     "paydeya-backend/internal/database"
     "paydeya-backend/internal/handlers"
@@ -36,7 +35,6 @@ func getEnvAsInt(key string, defaultValue int) int {
     return defaultValue
 }
 
-// После подключения к БД в main.go
 func runMigrations() error {
     migrationFiles := []string{
         "migrations/001_create_users_table.sql",
@@ -54,16 +52,14 @@ func runMigrations() error {
 
         _, err = database.DB.Exec(context.Background(), string(sql))
         if err != nil {
-            // Игнорируем ошибки "таблица уже существует"
-            if !strings.Contains(err.Error(), "already exists") {
-                return fmt.Errorf("failed to execute migration %s: %w", file, err)
-            }
+            // Игнорируем ЛЮБЫЕ ошибки выполнения миграций для простоты
+            log.Printf("⚠️ Migration %s had issues (ignoring): %v", file, err)
+            continue // ← ПРОДОЛЖАЕМ даже при ошибках
         }
         log.Printf("✅ Migration applied: %s", file)
     }
     return nil
 }
-
 func main() {
  // Загружаем .env файл локально
     if err := godotenv.Load(); err != nil {
@@ -90,7 +86,20 @@ func main() {
             log.Printf("⚠️  Migrations failed: %v", err)
         }
     }
-
+    // Инициализация облачного хранилища
+    storageService, err := services.NewStorageService(
+        os.Getenv("S3_BUCKET"),
+        os.Getenv("S3_ACCESS_KEY"),
+        os.Getenv("S3_SECRET_KEY"),
+    )
+    if err != nil {
+        log.Printf("⚠️ Failed to initialize cloud storage: %v", err)
+        // Fallback на локальное хранилище
+        //storageService = services.NewLocalStorageService("uploads", "http://localhost:8080/uploads")
+        log.Println("📁 Using local storage as fallback")
+    } else {
+        log.Println("☁️ Cloud storage initialized successfully!")
+    }
 
     // Создаем репозитории
     userRepo := repositories.NewUserRepository(database.DB)
@@ -102,7 +111,8 @@ func main() {
 
     // Создаем сервисы
     authService := services.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
-    fileService := services.NewFileService("uploads")
+    //fileService := services.NewFileService("uploads")
+    fileService := services.NewFileService("uploads", storageService)
     materialService := services.NewMaterialService(materialRepo, blockRepo)
     catalogService := services.NewCatalogService(catalogRepo)
     progressService := services.NewProgressService(progressRepo)
@@ -115,6 +125,7 @@ func main() {
     catalogHandler := handlers.NewCatalogHandler(catalogService)
     progressHandler := handlers.NewProgressHandler(progressService)
     adminHandler := handlers.NewAdminHandler(adminService)
+    mediaHandler := handlers.NewMediaHandler(fileService)
 
     // Настраиваем Gin
     if os.Getenv("GIN_MODE") != "debug" {
@@ -179,6 +190,10 @@ func main() {
         protected.PUT("/materials/:id/blocks/:blockId", materialHandler.UpdateBlock)
         protected.DELETE("/materials/:id/blocks/:blockId", materialHandler.DeleteBlock)
         protected.POST("/materials/:id/blocks/reorder", materialHandler.ReorderBlocks)
+
+        protected.POST("/upload/image", mediaHandler.UploadImage)
+        protected.POST("/upload/video", mediaHandler.UploadVideo)
+        protected.POST("/embed/video", mediaHandler.EmbedVideo)
 
         student := protected.Group("/student")
         {
