@@ -32,3 +32,4 @@ VALUES
     ('teacher@example.com', 'hashed_password_2', 'Мария Сидорова', 'teacher', true),
     ('admin@example.com', 'hashed_password_3', 'Администратор Системы', 'admin', true)
 ON CONFLICT (email) DO NOTHING;
+

@@ -15,7 +15,7 @@ func NewAdminService(adminRepo *repositories.AdminRepository) *AdminService {
     return &AdminService{adminRepo: adminRepo}
 }
 
-// GetPlatformStats возвращает статистику платформы
+// GetPlatformStats возвращает статистику платформыrrrr
 func (s *AdminService) GetPlatformStats(ctx context.Context) (*models.AdminStats, error) {
     return s.adminRepo.GetPlatformStats(ctx)
 }
