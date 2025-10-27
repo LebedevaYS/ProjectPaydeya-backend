@@ -108,9 +108,45 @@ func (s *FileService) uploadVideoLocal(ctx context.Context, file io.Reader, file
     }, nil
 }
 
-// SaveAvatar сохраняет аватар и возвращает URL (существующий метод)
+// SaveAvatar сохраняет аватар и возвращает URL
 func (s *FileService) SaveAvatar(userID int, fileHeader *multipart.FileHeader) (string, error) {
-    // ... ваш существующий код без изменений ...
+    // Открываем файл
+    file, err := fileHeader.Open()
+    if err != nil {
+        return "", fmt.Errorf("failed to open file: %w", err)
+    }
+    defer file.Close()
+
+    // Проверяем тип файла
+    buff := make([]byte, 512)
+    _, err = file.Read(buff)
+    if err != nil {
+        return "", fmt.Errorf("failed to read file: %w", err)
+    }
+
+    fileType := http.DetectContentType(buff)
+    if !strings.HasPrefix(fileType, "image/") {
+        return "", fmt.Errorf("file is not an image")
+    }
+
+    // Сбрасываем позицию чтения
+    file.Seek(0, 0)
+
+    // Если есть облачное хранилище - используем его
+    if s.storageService != nil {
+        result, err := s.storageService.UploadImage(context.Background(), file, fileHeader.Filename, userID)
+        if err != nil {
+            return "", fmt.Errorf("failed to upload to cloud: %w", err)
+        }
+        return result.URL, nil
+    }
+
+    // Fallback на локальное хранилище
+    return s.saveAvatarLocal(userID, fileHeader)
+}
+
+// saveAvatarLocal - локальное сохранение (старая логика)
+func (s *FileService) saveAvatarLocal(userID int, fileHeader *multipart.FileHeader) (string, error) {
     file, err := fileHeader.Open()
     if err != nil {
         return "", fmt.Errorf("failed to open file: %w", err)
@@ -157,7 +193,6 @@ func (s *FileService) SaveAvatar(userID int, fileHeader *multipart.FileHeader) (
     // Возвращаем относительный путь
     return "/uploads/avatars/" + fileName, nil
 }
-
 // DeleteAvatar удаляет старый аватар (существующий метод)
 func (s *FileService) DeleteAvatar(avatarURL string) error {
     if avatarURL == "" {
