@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS specializations (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Вставляем тестовые данные для проверки
+-- Вставляем тестовые данные для проверкиjgh
 INSERT INTO users (email, password_hash, full_name, role, is_verified)
 VALUES
     ('student@example.com', 'hashed_password_1', 'Иван Петров', 'student', true),
