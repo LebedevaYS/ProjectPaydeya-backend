@@ -12,6 +12,5 @@ func HealthCheck(c *gin.Context) {
         "status":    "ok",
         "timestamp": time.Now().Format(time.RFC3339),
         "service":   "paydeya-backend",
-        "database":  "connected", // Позже добавим проверку БД
     })
 }

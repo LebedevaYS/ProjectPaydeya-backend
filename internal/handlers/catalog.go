@@ -17,7 +17,21 @@ func NewCatalogHandler(catalogService *services.CatalogService) *CatalogHandler 
     return &CatalogHandler{catalogService: catalogService}
 }
 
-// SearchMaterials поиск материалов в каталоге
+// SearchMaterials godoc
+// @Summary Поиск материалов в каталоге
+// @Description Возвращает материалы с фильтрацией и пагинацией
+// @Tags catalog
+// @Accept json
+// @Produce json
+// @Param search query string false "Поисковый запрос"
+// @Param subject query string false "Фильтр по предмету"
+// @Param level query string false "Фильтр по уровню сложности"
+// @Param page query int false "Номер страницы" default(1)
+// @Param limit query int false "Количество материалов на странице" default(20)
+// @Success 200 {object} MaterialsResponse "Список материалов"
+// @Failure 400 {object} ErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /catalog/materials [get]
 func (h *CatalogHandler) SearchMaterials(c *gin.Context) {
     var filters models.CatalogFilters
 
@@ -50,7 +64,15 @@ func (h *CatalogHandler) SearchMaterials(c *gin.Context) {
     })
 }
 
-// GetSubjects возвращает список предметов
+// GetSubjects godoc
+// @Summary Получить список предметов
+// @Description Возвращает все доступные учебные предметы
+// @Tags catalog
+// @Accept json
+// @Produce json
+// @Success 200 {object} SubjectsResponse "Список предметов"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /catalog/subjects [get]
 func (h *CatalogHandler) GetSubjects(c *gin.Context) {
     subjects, err := h.catalogService.GetSubjects(c.Request.Context())
     if err != nil {
@@ -63,7 +85,18 @@ func (h *CatalogHandler) GetSubjects(c *gin.Context) {
     })
 }
 
-// SearchTeachers поиск преподавателей
+// SearchTeachers godoc
+// @Summary Поиск преподавателей
+// @Description Возвращает преподавателей с фильтрацией
+// @Tags catalog
+// @Accept json
+// @Produce json
+// @Param search query string false "Поисковый запрос"
+// @Param subject query string false "Фильтр по предмету"
+// @Success 200 {object} TeachersResponse "Список преподавателей"
+// @Failure 400 {object} ErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /catalog/teachers [get]
 func (h *CatalogHandler) SearchTeachers(c *gin.Context) {
     var filters models.TeacherFilters
 
@@ -82,3 +115,28 @@ func (h *CatalogHandler) SearchTeachers(c *gin.Context) {
         "teachers": teachers,
     })
 }
+
+// Response models for Swagger
+
+// MaterialsResponse represents materials search response
+// @Description Ответ с результатами поиска материалов
+type MaterialsResponse struct {
+    Materials []models.CatalogMaterial `json:"materials"`
+    Total     int                      `json:"total" example:"150"`
+    Page      int                      `json:"page" example:"1"`
+    Limit     int                      `json:"limit" example:"20"`
+    HasMore   bool                     `json:"hasMore" example:"true"`
+}
+
+// SubjectsResponse represents subjects list response
+// @Description Ответ со списком предметов
+type SubjectsResponse struct {
+    Subjects []models.Subject `json:"subjects"`
+}
+
+// TeachersResponse represents teachers search response
+// @Description Ответ с результатами поиска преподавателей
+type TeachersResponse struct {
+    Teachers []models.Teacher `json:"teachers"`
+}
+

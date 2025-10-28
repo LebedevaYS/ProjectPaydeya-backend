@@ -24,7 +24,17 @@ func NewProfileHandler(authService *services.AuthService, userRepo *repositories
     }
 }
 
-// GetProfile возвращает данные профиля
+// GetProfile godoc
+// @Summary Получить профиль пользователя
+// @Description Возвращает данные профиля текущего пользователя
+// @Tags profile
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} ProfileResponse "Данные профиля"
+// @Failure 404 {object} ErrorResponse "Пользователь не найден"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /profile [get]
 func (h *ProfileHandler) GetProfile(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -61,15 +71,22 @@ func (h *ProfileHandler) GetProfile(c *gin.Context) {
     })
 }
 
-// UpdateProfile обновляет данные профиля
+// UpdateProfile godoc
+// @Summary Обновить профиль
+// @Description Обновляет данные профиля пользователя
+// @Tags profile
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param input body UpdateProfileRequest true "Данные для обновления"
+// @Success 200 {object} UpdateProfileResponse "Профиль обновлен"
+// @Failure 400 {object} ErrorResponse "Неверные данные"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /profile [put]
 func (h *ProfileHandler) UpdateProfile(c *gin.Context) {
     userID := c.GetInt("userID")
 
-    var req struct {
-        FullName       string   `json:"fullName"`
-        Specializations []string `json:"specializations"`
-    }
-
+    var req UpdateProfileRequest
     if err := c.ShouldBindJSON(&req); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
@@ -89,8 +106,18 @@ func (h *ProfileHandler) UpdateProfile(c *gin.Context) {
     })
 }
 
-
-// UploadAvatar загружает аватар
+// UploadAvatar godoc
+// @Summary Загрузить аватар
+// @Description Загружает аватар пользователя
+// @Tags profile
+// @Accept multipart/form-data
+// @Produce json
+// @Security ApiKeyAuth
+// @Param avatar formData file true "Файл аватара (макс. 5MB)"
+// @Success 200 {object} UploadAvatarResponse "Аватар загружен"
+// @Failure 400 {object} ErrorResponse "Неверный файл"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /profile/avatar [post]
 func (h *ProfileHandler) UploadAvatar(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -138,3 +165,42 @@ func (h *ProfileHandler) UploadAvatar(c *gin.Context) {
         "avatarUrl": avatarURL,
     })
 }
+
+// Request/Response models for Swagger
+
+// ProfileResponse represents user profile response
+// @Description Ответ с данными профиля пользователя
+type ProfileResponse struct {
+    ID              int       `json:"id" example:"123"`
+    Email           string    `json:"email" example:"user@example.com"`
+    FullName        string    `json:"fullName" example:"Иван Иванов"`
+    Role            string    `json:"role" example:"teacher"`
+    AvatarURL       string    `json:"avatarUrl" example:"https://example.com/avatars/123.jpg"`
+    IsVerified      bool      `json:"isVerified" example:"true"`
+    Specializations []string  `json:"specializations" example:"math,physics"`
+    CreatedAt       string    `json:"createdAt" example:"2023-01-15T10:30:00Z"`
+    UpdatedAt       string    `json:"updatedAt" example:"2023-01-15T10:30:00Z"`
+}
+
+// UpdateProfileRequest represents update profile request
+// @Description Запрос на обновление профиля
+type UpdateProfileRequest struct {
+    FullName        string   `json:"fullName" example:"Иван Иванов"`
+    Specializations []string `json:"specializations" example:"math,physics"`
+}
+
+// UpdateProfileResponse represents update profile response
+// @Description Ответ на обновление профиля
+type UpdateProfileResponse struct {
+    Message string               `json:"message" example:"Profile updated successfully"`
+    UserID  int                  `json:"userID" example:"123"`
+    Data    UpdateProfileRequest `json:"data"`
+}
+
+// UploadAvatarResponse represents upload avatar response
+// @Description Ответ на загрузку аватара
+type UploadAvatarResponse struct {
+    Message   string `json:"message" example:"Avatar uploaded successfully"`
+    AvatarURL string `json:"avatarUrl" example:"https://example.com/avatars/123.jpg"`
+}
+

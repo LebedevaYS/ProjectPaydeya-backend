@@ -1,0 +1,2732 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API для образовательной платформы Пайдея",
+        "title": "Paydeya Education Platform API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/admin/statistics": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Возвращает общую статистику платформы (пользователи, материалы, преподаватели)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Получить статистику платформы",
+                "responses": {
+                    "200": {
+                        "description": "Статистика платформы",
+                        "schema": {
+                            "$ref": "#/definitions/models.AdminStats"
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Доступ запрещен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/subjects": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Создает новый учебный предмет",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Создать предмет",
+                "parameters": [
+                    {
+                        "description": "Данные предмета",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateSubjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Предмет создан",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Доступ запрещен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Возвращает список пользователей с пагинацией и фильтрацией по роли",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Получить список пользователей",
+                "parameters": [
+                    {
+                        "enum": [
+                            "student",
+                            "teacher",
+                            "admin"
+                        ],
+                        "type": "string",
+                        "description": "Фильтр по роли",
+                        "name": "role",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Номер страницы",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Количество записей на странице",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список пользователей",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UsersListResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Доступ запрещен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{id}/block": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Блокирует пользователя по ID с указанием причины",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Заблокировать пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные для блокировки",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BlockUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Пользователь заблокирован",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Требуется авторизация",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Доступ запрещен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Пользователь не найден",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "description": "Отправляет инструкции по сбросу пароля на email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Запрос сброса пароля",
+                "parameters": [
+                    {
+                        "description": "Email для сброса пароля",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ForgotPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Инструкции отправлены",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "description": "Аутентифицирует пользователя и возвращает токены",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Вход в систему",
+                "parameters": [
+                    {
+                        "description": "Данные для входа",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный вход",
+                        "schema": {
+                            "$ref": "#/definitions/models.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Неверные учетные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Завершает сеанс пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Выход из системы",
+                "responses": {
+                    "200": {
+                        "description": "Успешный выход",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "description": "Обновляет access и refresh токены",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Обновление токенов",
+                "parameters": [
+                    {
+                        "description": "Refresh токен",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.RefreshTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Токены обновлены",
+                        "schema": {
+                            "$ref": "#/definitions/models.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Невалидный токен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "description": "Создает нового пользователя и возвращает токены",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Регистрация пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные для регистрации",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Пользователь создан",
+                        "schema": {
+                            "$ref": "#/definitions/models.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "description": "Устанавливает новый пароль по токену сброса",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Сброс пароля",
+                "parameters": [
+                    {
+                        "description": "Данные для сброса пароля",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ResetPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Пароль изменен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные или токен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/materials": {
+            "get": {
+                "description": "Возвращает материалы с фильтрацией и пагинацией",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "catalog"
+                ],
+                "summary": "Поиск материалов в каталоге",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Поисковый запрос",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Фильтр по предмету",
+                        "name": "subject",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Фильтр по уровню сложности",
+                        "name": "level",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Номер страницы",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Количество материалов на странице",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список материалов",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MaterialsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные параметры запроса",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/subjects": {
+            "get": {
+                "description": "Возвращает все доступные учебные предметы",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "catalog"
+                ],
+                "summary": "Получить список предметов",
+                "responses": {
+                    "200": {
+                        "description": "Список предметов",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SubjectsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/teachers": {
+            "get": {
+                "description": "Возвращает преподавателей с фильтрацией",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "catalog"
+                ],
+                "summary": "Поиск преподавателей",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Поисковый запрос",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Фильтр по предмету",
+                        "name": "subject",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список преподавателей",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.TeachersResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные параметры запроса",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/materials": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Создает новый учебный материал",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Создать материал",
+                "parameters": [
+                    {
+                        "description": "Данные материала",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateMaterialRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Материал создан",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateMaterialResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/materials/my": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Возвращает материалы текущего пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Получить материалы пользователя",
+                "parameters": [
+                    {
+                        "enum": [
+                            "draft",
+                            "published",
+                            "archived"
+                        ],
+                        "type": "string",
+                        "description": "Фильтр по статусу",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Материалы пользователя",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserMaterialsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/materials/{id}": {
+            "get": {
+                "description": "Возвращает материал по ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Получить материал",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Материал",
+                        "schema": {
+                            "$ref": "#/definitions/models.Material"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный ID",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Материал не найден",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Обновляет материал (только для автора)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Обновить материал",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные для обновления",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateMaterialRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Материал обновлен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Доступ запрещен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/materials/{id}/blocks": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Добавляет блок к материалу",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Добавить блок",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные блока",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Block"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Блок добавлен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.AddBlockResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/materials/{id}/blocks/{blockId}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Обновляет блок материала",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Обновить блок",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID блока",
+                        "name": "blockId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные блока",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Block"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Блок обновлен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Удаляет блок из материала",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Удалить блок",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID блока",
+                        "name": "blockId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Блок удален",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/materials/{id}/publish": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Публикует материал с указанными настройками видимости",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Опубликовать материал",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Настройки публикации",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PublishMaterialRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Материал опубликован",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.PublishMaterialResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/materials/{id}/reorder": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Изменяет порядок блоков в материале",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Изменить порядок блоков",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новый порядок блоков",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ReorderBlocksRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Порядок изменен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ReorderBlocksResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/media/embed": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Создает embed ссылку для видео с YouTube, VK и других сервисов",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "media"
+                ],
+                "summary": "Вставить видео по ссылке",
+                "parameters": [
+                    {
+                        "description": "URL видео",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.EmbedVideoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ссылка для вставки создана",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.EmbedVideoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный URL",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка обработки",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/media/images": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Загружает изображение для использования в материалах",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "media"
+                ],
+                "summary": "Загрузить изображение",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл изображения",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Изображение загружено",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UploadImageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный файл",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка загрузки",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/media/videos": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Загружает видео файл для использования в материалах",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "media"
+                ],
+                "summary": "Загрузить видео",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл видео",
+                        "name": "video",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Видео загружено",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UploadVideoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный файл",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка загрузки",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Возвращает данные профиля текущего пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Получить профиль пользователя",
+                "responses": {
+                    "200": {
+                        "description": "Данные профиля",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ProfileResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Пользователь не найден",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Обновляет данные профиля пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Обновить профиль",
+                "parameters": [
+                    {
+                        "description": "Данные для обновления",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Профиль обновлен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateProfileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/avatar": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Загружает аватар пользователя",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Загрузить аватар",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл аватара (макс. 5MB)",
+                        "name": "avatar",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Аватар загружен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UploadAvatarResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный файл",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/progress": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Возвращает прогресс обучения текущего пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "progress"
+                ],
+                "summary": "Получить прогресс обучения",
+                "responses": {
+                    "200": {
+                        "description": "Прогресс обучения",
+                        "schema": {
+                            "$ref": "#/definitions/models.StudentProgress"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/progress/favorites": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Возвращает список избранных материалов пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "progress"
+                ],
+                "summary": "Получить избранные материалы",
+                "responses": {
+                    "200": {
+                        "description": "Список избранных материалов",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.FavoritesResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/progress/favorites/{id}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Добавляет или удаляет материал из избранного",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "progress"
+                ],
+                "summary": "Добавить/удалить из избранного",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Действие с избранным",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ToggleFavoriteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Статус избранного обновлен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ToggleFavoriteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/progress/materials/{id}/complete": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Отмечает материал как завершенный с оценкой и временем изучения",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "progress"
+                ],
+                "summary": "Отметить материал как завершенный",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные завершения",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MarkCompleteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Материал отмечен как завершенный",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MarkCompleteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.AddBlockResponse": {
+            "description": "Ответ на добавление блока",
+            "type": "object",
+            "properties": {
+                "blockId": {
+                    "type": "string",
+                    "example": "block_123"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Block added successfully"
+                }
+            }
+        },
+        "handlers.CreateMaterialResponse": {
+            "description": "Ответ на создание материала",
+            "type": "object",
+            "properties": {
+                "editorUrl": {
+                    "type": "string",
+                    "example": "/editor/1"
+                },
+                "material": {
+                    "$ref": "#/definitions/models.Material"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Material created successfully"
+                }
+            }
+        },
+        "handlers.EmbedVideoRequest": {
+            "description": "Запрос на создание embed ссылки для видео",
+            "type": "object",
+            "required": [
+                "url"
+            ],
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "example": "https://www.youtube.com/watch?v=abc123"
+                }
+            }
+        },
+        "handlers.EmbedVideoResponse": {
+            "description": "Ответ с embed ссылкой для видео",
+            "type": "object",
+            "properties": {
+                "embedUrl": {
+                    "type": "string",
+                    "example": "https://www.youtube.com/embed/abc123"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Video embed URL generated"
+                },
+                "originalUrl": {
+                    "type": "string",
+                    "example": "https://www.youtube.com/watch?v=abc123"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "youtube"
+                }
+            }
+        },
+        "handlers.ErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Authorization header required"
+                }
+            }
+        },
+        "handlers.FavoritesResponse": {
+            "description": "Ответ со списком избранных материалов",
+            "type": "object",
+            "properties": {
+                "materials": {
+                    "description": "Замените на конкретный тип когда будет реализовано",
+                    "type": "array",
+                    "items": {}
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 5
+                }
+            }
+        },
+        "handlers.MarkCompleteRequest": {
+            "description": "Запрос на отметку материала как завершенного",
+            "type": "object",
+            "required": [
+                "grade",
+                "timeSpent"
+            ],
+            "properties": {
+                "grade": {
+                    "type": "number",
+                    "maximum": 5,
+                    "minimum": 1,
+                    "example": 4.5
+                },
+                "timeSpent": {
+                    "type": "integer",
+                    "example": 3600
+                }
+            }
+        },
+        "handlers.MarkCompleteResponse": {
+            "description": "Ответ на отметку материала как завершенного",
+            "type": "object",
+            "properties": {
+                "materialID": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Material marked as completed"
+                }
+            }
+        },
+        "handlers.MaterialsResponse": {
+            "description": "Ответ с результатами поиска материалов",
+            "type": "object",
+            "properties": {
+                "hasMore": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "limit": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "materials": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CatalogMaterial"
+                    }
+                },
+                "page": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 150
+                }
+            }
+        },
+        "handlers.ProfileResponse": {
+            "description": "Ответ с данными профиля пользователя",
+            "type": "object",
+            "properties": {
+                "avatarUrl": {
+                    "type": "string",
+                    "example": "https://example.com/avatars/123.jpg"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "example": "2023-01-15T10:30:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "fullName": {
+                    "type": "string",
+                    "example": "Иван Иванов"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "isVerified": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "role": {
+                    "type": "string",
+                    "example": "teacher"
+                },
+                "specializations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "math",
+                        "physics"
+                    ]
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "example": "2023-01-15T10:30:00Z"
+                }
+            }
+        },
+        "handlers.PublishMaterialResponse": {
+            "description": "Ответ на публикацию материала",
+            "type": "object",
+            "properties": {
+                "material": {
+                    "$ref": "#/definitions/models.Material"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Material published successfully"
+                },
+                "shareUrl": {
+                    "type": "string",
+                    "example": "https://paydeya.com/share/abc123"
+                }
+            }
+        },
+        "handlers.RefreshTokenRequest": {
+            "description": "Запрос на обновление токенов",
+            "type": "object",
+            "required": [
+                "refreshToken"
+            ],
+            "properties": {
+                "refreshToken": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "handlers.ReorderBlocksRequest": {
+            "description": "Запрос на изменение порядка блоков",
+            "type": "object",
+            "required": [
+                "blocks"
+            ],
+            "properties": {
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "block_1",
+                        "block_2",
+                        "block_3"
+                    ]
+                }
+            }
+        },
+        "handlers.ReorderBlocksResponse": {
+            "description": "Ответ на изменение порядка блоков",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Blocks reordered successfully"
+                },
+                "newOrder": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "block_1",
+                        "block_2",
+                        "block_3"
+                    ]
+                }
+            }
+        },
+        "handlers.SubjectsResponse": {
+            "description": "Ответ со списком предметов",
+            "type": "object",
+            "properties": {
+                "subjects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Subject"
+                    }
+                }
+            }
+        },
+        "handlers.SuccessResponse": {
+            "description": "Стандартный успешный ответ",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Operation completed successfully"
+                }
+            }
+        },
+        "handlers.TeachersResponse": {
+            "description": "Ответ с результатами поиска преподавателей",
+            "type": "object",
+            "properties": {
+                "teachers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Teacher"
+                    }
+                }
+            }
+        },
+        "handlers.ToggleFavoriteRequest": {
+            "description": "Запрос на добавление/удаление из избранного",
+            "type": "object",
+            "required": [
+                "action"
+            ],
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": [
+                        "add",
+                        "remove"
+                    ],
+                    "example": "add"
+                }
+            }
+        },
+        "handlers.ToggleFavoriteResponse": {
+            "description": "Ответ на добавление/удаление из избранного",
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "add"
+                },
+                "materialID": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Favorite updated successfully"
+                }
+            }
+        },
+        "handlers.UpdateProfileRequest": {
+            "description": "Запрос на обновление профиля",
+            "type": "object",
+            "properties": {
+                "fullName": {
+                    "type": "string",
+                    "example": "Иван Иванов"
+                },
+                "specializations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "math",
+                        "physics"
+                    ]
+                }
+            }
+        },
+        "handlers.UpdateProfileResponse": {
+            "description": "Ответ на обновление профиля",
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/handlers.UpdateProfileRequest"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Profile updated successfully"
+                },
+                "userID": {
+                    "type": "integer",
+                    "example": 123
+                }
+            }
+        },
+        "handlers.UploadAvatarResponse": {
+            "description": "Ответ на загрузку аватара",
+            "type": "object",
+            "properties": {
+                "avatarUrl": {
+                    "type": "string",
+                    "example": "https://example.com/avatars/123.jpg"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Avatar uploaded successfully"
+                }
+            }
+        },
+        "handlers.UploadImageResponse": {
+            "description": "Ответ на загрузку изображения",
+            "type": "object",
+            "properties": {
+                "fileName": {
+                    "type": "string",
+                    "example": "image.jpg"
+                },
+                "height": {
+                    "type": "integer",
+                    "example": 1080
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Image uploaded successfully"
+                },
+                "size": {
+                    "type": "integer",
+                    "example": 102400
+                },
+                "url": {
+                    "type": "string",
+                    "example": "https://example.com/images/abc123.jpg"
+                },
+                "width": {
+                    "type": "integer",
+                    "example": 1920
+                }
+            }
+        },
+        "handlers.UploadVideoResponse": {
+            "description": "Ответ на загрузку видео",
+            "type": "object",
+            "properties": {
+                "fileName": {
+                    "type": "string",
+                    "example": "video.mp4"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Video uploaded successfully"
+                },
+                "size": {
+                    "type": "integer",
+                    "example": 10485760
+                },
+                "url": {
+                    "type": "string",
+                    "example": "https://example.com/videos/abc123.mp4"
+                }
+            }
+        },
+        "handlers.UserMaterialsResponse": {
+            "description": "Ответ со списком материалов пользователя",
+            "type": "object",
+            "properties": {
+                "materials": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "example": "User materials endpoint"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "draft"
+                },
+                "userID": {
+                    "type": "integer",
+                    "example": 123
+                }
+            }
+        },
+        "handlers.UsersListResponse": {
+            "description": "Ответ со списком пользователей",
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "page": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 150
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserManagement"
+                    }
+                }
+            }
+        },
+        "models.AdminStats": {
+            "description": "Статистика платформы для админ-панели",
+            "type": "object",
+            "properties": {
+                "activeTeachers": {
+                    "type": "integer"
+                },
+                "publishedMaterials": {
+                    "type": "integer"
+                },
+                "totalMaterials": {
+                    "type": "integer"
+                },
+                "totalUsers": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.AnimationStep": {
+            "description": "Шаг анимации",
+            "type": "object",
+            "properties": {
+                "action": {
+                    "description": "show, hide, highlight",
+                    "type": "string",
+                    "example": "show"
+                },
+                "element": {
+                    "type": "string",
+                    "example": "element_1"
+                },
+                "style": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "models.AuthResponse": {
+            "description": "Ответ с токенами и данными пользователя",
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "refreshToken": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                }
+            }
+        },
+        "models.Author": {
+            "description": "Автор материала",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Иван Иванов"
+                }
+            }
+        },
+        "models.Block": {
+            "description": "Блок контента в материале",
+            "type": "object",
+            "properties": {
+                "animation": {
+                    "$ref": "#/definitions/models.BlockAnimation"
+                },
+                "content": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "id": {
+                    "type": "string",
+                    "example": "block_123"
+                },
+                "position": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "styles": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "type": {
+                    "description": "text, image, video, formula, quiz",
+                    "type": "string",
+                    "example": "text"
+                }
+            }
+        },
+        "models.BlockAnimation": {
+            "description": "Анимация блока",
+            "type": "object",
+            "properties": {
+                "delay": {
+                    "type": "integer",
+                    "example": 1000
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.AnimationStep"
+                    }
+                },
+                "trigger": {
+                    "description": "click, auto",
+                    "type": "string",
+                    "example": "click"
+                }
+            }
+        },
+        "models.BlockUserRequest": {
+            "description": "Запрос на блокировку пользователя",
+            "type": "object",
+            "required": [
+                "reason"
+            ],
+            "properties": {
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CatalogMaterial": {
+            "description": "Материал в каталоге",
+            "type": "object",
+            "properties": {
+                "author": {
+                    "$ref": "#/definitions/models.Author"
+                },
+                "duration": {
+                    "type": "integer",
+                    "example": 120
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "level": {
+                    "type": "string",
+                    "example": "beginner"
+                },
+                "rating": {
+                    "type": "number",
+                    "example": 4.8
+                },
+                "studentsCount": {
+                    "type": "integer",
+                    "example": 150
+                },
+                "subject": {
+                    "type": "string",
+                    "example": "math"
+                },
+                "thumbnailUrl": {
+                    "type": "string",
+                    "example": "https://example.com/thumbnail.jpg"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Основы алгебры"
+                }
+            }
+        },
+        "models.CreateMaterialRequest": {
+            "description": "Запрос на создание материала",
+            "type": "object",
+            "required": [
+                "subject",
+                "title"
+            ],
+            "properties": {
+                "subject": {
+                    "type": "string",
+                    "example": "math"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Новый материал"
+                }
+            }
+        },
+        "models.CreateSubjectRequest": {
+            "description": "Запрос на создание нового предмета",
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ForgotPasswordRequest": {
+            "description": "Запрос на сброс пароля",
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginRequest": {
+            "description": "Запрос на вход",
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Material": {
+            "description": "Учебный материал",
+            "type": "object",
+            "properties": {
+                "access": {
+                    "description": "open, link",
+                    "type": "string",
+                    "example": "open"
+                },
+                "authorId": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "authorName": {
+                    "type": "string",
+                    "example": "Иван Иванов"
+                },
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Block"
+                    }
+                },
+                "createdAt": {
+                    "type": "string",
+                    "example": "2023-01-15T10:30:00Z"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "shareUrl": {
+                    "type": "string",
+                    "example": "https://paydeya.com/share/abc123"
+                },
+                "status": {
+                    "description": "draft, published, archived",
+                    "type": "string",
+                    "example": "published"
+                },
+                "subject": {
+                    "type": "string",
+                    "example": "math"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Основы алгебры"
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "example": "2023-01-15T10:30:00Z"
+                }
+            }
+        },
+        "models.ProgressMaterial": {
+            "description": "Материал с информацией о прогрессе",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "lastActivity": {
+                    "type": "string",
+                    "example": "2023-01-15T10:30:00Z"
+                },
+                "progress": {
+                    "description": "0-100%",
+                    "type": "number",
+                    "example": 75.5
+                },
+                "subject": {
+                    "type": "string",
+                    "example": "math"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Основы алгебры"
+                }
+            }
+        },
+        "models.PublishMaterialRequest": {
+            "description": "Запрос на публикацию материала",
+            "type": "object",
+            "properties": {
+                "access": {
+                    "description": "open, link",
+                    "type": "string",
+                    "example": "open"
+                },
+                "visibility": {
+                    "description": "draft, published, archived",
+                    "type": "string",
+                    "example": "published"
+                }
+            }
+        },
+        "models.RegisterRequest": {
+            "description": "Запрос на регистрацию",
+            "type": "object",
+            "required": [
+                "email",
+                "fullName",
+                "password",
+                "role"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "fullName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "student",
+                        "teacher",
+                        "admin"
+                    ]
+                }
+            }
+        },
+        "models.ResetPasswordRequest": {
+            "description": "Запрос на установку нового пароля",
+            "type": "object",
+            "required": [
+                "newPassword",
+                "token"
+            ],
+            "properties": {
+                "newPassword": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.StudentProgress": {
+            "description": "Прогресс обучения студента",
+            "type": "object",
+            "properties": {
+                "averageGrade": {
+                    "type": "number",
+                    "example": 4.2
+                },
+                "completedTopics": {
+                    "type": "integer",
+                    "example": 15
+                },
+                "currentMaterials": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ProgressMaterial"
+                    }
+                },
+                "learningHours": {
+                    "type": "integer",
+                    "example": 120
+                },
+                "successRate": {
+                    "type": "number",
+                    "example": 85.5
+                }
+            }
+        },
+        "models.Subject": {
+            "description": "Учебный предмет",
+            "type": "object",
+            "properties": {
+                "icon": {
+                    "type": "string",
+                    "example": "📐"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "math"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Математика"
+                }
+            }
+        },
+        "models.Teacher": {
+            "description": "Преподаватель в каталоге",
+            "type": "object",
+            "properties": {
+                "avatarUrl": {
+                    "type": "string",
+                    "example": "https://example.com/avatar.jpg"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "materialsCount": {
+                    "type": "integer",
+                    "example": 25
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Мария Петрова"
+                },
+                "rating": {
+                    "type": "number",
+                    "example": 4.9
+                },
+                "specializations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "math",
+                        "physics"
+                    ]
+                }
+            }
+        },
+        "models.UpdateMaterialRequest": {
+            "description": "Запрос на обновление материала",
+            "type": "object",
+            "properties": {
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Block"
+                    }
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Обновленное название"
+                }
+            }
+        },
+        "models.User": {
+            "description": "Модель пользователя",
+            "type": "object",
+            "properties": {
+                "avatarUrl": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "fullName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isVerified": {
+                    "type": "boolean"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserManagement": {
+            "description": "Данные пользователя для управления в админ-панели",
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "← Измените на time.Time",
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "fullName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isVerified": {
+                    "type": "boolean"
+                },
+                "materialsCount": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "Введите: Bearer {token}",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "tags": [
+        {
+            "description": "Эндпоинты для администраторов",
+            "name": "admin"
+        },
+        {
+            "description": "Поиск материалов и преподавателей",
+            "name": "catalog"
+        },
+        {
+            "description": "Авторизация и работа с паролями",
+            "name": "auth"
+        },
+        {
+            "description": "Управление учебными материалами",
+            "name": "materials"
+        },
+        {
+            "description": "Отслеживание прогресса обучения и избранное",
+            "name": "progress"
+        },
+        {
+            "description": "Управление профилем пользователя",
+            "name": "profile"
+        },
+        {
+            "description": "Загрузка и управление медиафайлами",
+            "name": "media"
+        }
+    ]
+}

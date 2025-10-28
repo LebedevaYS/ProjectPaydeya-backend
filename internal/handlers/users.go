@@ -8,13 +8,6 @@ import (
     "github.com/jackc/pgx/v5"
 )
 
-func GetUsers(c *gin.Context) {
-    // Это заглушка - позже мы добавим подключение к БД через сервисный слой
-    c.JSON(http.StatusOK, gin.H{
-        "message": "Users endpoint - to be implemented",
-        "users":   []string{},
-    })
-}
 
 // Временная функция для тестирования БД
 func GetUsersTest(db *pgx.Conn) gin.HandlerFunc {

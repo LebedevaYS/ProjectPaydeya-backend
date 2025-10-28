@@ -3,7 +3,6 @@ package handlers
 import (
     "net/http"
 
-
     "paydeya-backend/internal/services"
 
     "github.com/gin-gonic/gin"
@@ -17,7 +16,18 @@ func NewMediaHandler(fileService *services.FileService) *MediaHandler {
     return &MediaHandler{fileService: fileService}
 }
 
-// UploadImage загружает изображение
+// UploadImage godoc
+// @Summary Загрузить изображение
+// @Description Загружает изображение для использования в материалах
+// @Tags media
+// @Accept multipart/form-data
+// @Produce json
+// @Security ApiKeyAuth
+// @Param image formData file true "Файл изображения"
+// @Success 200 {object} UploadImageResponse "Изображение загружено"
+// @Failure 400 {object} ErrorResponse "Неверный файл"
+// @Failure 500 {object} ErrorResponse "Ошибка загрузки"
+// @Router /media/images [post]
 func (h *MediaHandler) UploadImage(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -44,7 +54,18 @@ func (h *MediaHandler) UploadImage(c *gin.Context) {
     })
 }
 
-// UploadVideo загружает видео файл
+// UploadVideo godoc
+// @Summary Загрузить видео
+// @Description Загружает видео файл для использования в материалах
+// @Tags media
+// @Accept multipart/form-data
+// @Produce json
+// @Security ApiKeyAuth
+// @Param video formData file true "Файл видео"
+// @Success 200 {object} UploadVideoResponse "Видео загружено"
+// @Failure 400 {object} ErrorResponse "Неверный файл"
+// @Failure 500 {object} ErrorResponse "Ошибка загрузки"
+// @Router /media/videos [post]
 func (h *MediaHandler) UploadVideo(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -69,11 +90,20 @@ func (h *MediaHandler) UploadVideo(c *gin.Context) {
     })
 }
 
-// EmbedVideo обрабатывает вставку видео по ссылке (YouTube, VK и т.д.)
+// EmbedVideo godoc
+// @Summary Вставить видео по ссылке
+// @Description Создает embed ссылку для видео с YouTube, VK и других сервисов
+// @Tags media
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param input body EmbedVideoRequest true "URL видео"
+// @Success 200 {object} EmbedVideoResponse "Ссылка для вставки создана"
+// @Failure 400 {object} ErrorResponse "Неверный URL"
+// @Failure 500 {object} ErrorResponse "Ошибка обработки"
+// @Router /media/embed [post]
 func (h *MediaHandler) EmbedVideo(c *gin.Context) {
-    var request struct {
-        URL string `json:"url" binding:"required"`
-    }
+    var request EmbedVideoRequest
 
     if err := c.ShouldBindJSON(&request); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -108,5 +138,42 @@ func parseVideoURL(url string) (string, error) {
 func getVideoServiceType(url string) string {
     // TODO: Определить сервис по домену
     return "unknown"
+}
+
+// Request/Response models for Swagger
+
+// UploadImageResponse represents image upload response
+// @Description Ответ на загрузку изображения
+type UploadImageResponse struct {
+    Message  string `json:"message" example:"Image uploaded successfully"`
+    URL      string `json:"url" example:"https://example.com/images/abc123.jpg"`
+    FileName string `json:"fileName" example:"image.jpg"`
+    Size     int64  `json:"size" example:"102400"`
+    Width    int    `json:"width" example:"1920"`
+    Height   int    `json:"height" example:"1080"`
+}
+
+// UploadVideoResponse represents video upload response
+// @Description Ответ на загрузку видео
+type UploadVideoResponse struct {
+    Message  string `json:"message" example:"Video uploaded successfully"`
+    URL      string `json:"url" example:"https://example.com/videos/abc123.mp4"`
+    FileName string `json:"fileName" example:"video.mp4"`
+    Size     int64  `json:"size" example:"10485760"`
+}
+
+// EmbedVideoRequest represents embed video request
+// @Description Запрос на создание embed ссылки для видео
+type EmbedVideoRequest struct {
+    URL string `json:"url" binding:"required" example:"https://www.youtube.com/watch?v=abc123"`
+}
+
+// EmbedVideoResponse represents embed video response
+// @Description Ответ с embed ссылкой для видео
+type EmbedVideoResponse struct {
+    Message      string `json:"message" example:"Video embed URL generated"`
+    OriginalURL  string `json:"originalUrl" example:"https://www.youtube.com/watch?v=abc123"`
+    EmbedURL     string `json:"embedUrl" example:"https://www.youtube.com/embed/abc123"`
+    Type         string `json:"type" example:"youtube"`
 }
 

@@ -1,0 +1,1824 @@
+basePath: /api/v1
+definitions:
+  handlers.AddBlockResponse:
+    description: Ответ на добавление блока
+    properties:
+      blockId:
+        example: block_123
+        type: string
+      message:
+        example: Block added successfully
+        type: string
+    type: object
+  handlers.CreateMaterialResponse:
+    description: Ответ на создание материала
+    properties:
+      editorUrl:
+        example: /editor/1
+        type: string
+      material:
+        $ref: '#/definitions/models.Material'
+      message:
+        example: Material created successfully
+        type: string
+    type: object
+  handlers.EmbedVideoRequest:
+    description: Запрос на создание embed ссылки для видео
+    properties:
+      url:
+        example: https://www.youtube.com/watch?v=abc123
+        type: string
+    required:
+    - url
+    type: object
+  handlers.EmbedVideoResponse:
+    description: Ответ с embed ссылкой для видео
+    properties:
+      embedUrl:
+        example: https://www.youtube.com/embed/abc123
+        type: string
+      message:
+        example: Video embed URL generated
+        type: string
+      originalUrl:
+        example: https://www.youtube.com/watch?v=abc123
+        type: string
+      type:
+        example: youtube
+        type: string
+    type: object
+  handlers.ErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Authorization header required
+        type: string
+    type: object
+  handlers.FavoritesResponse:
+    description: Ответ со списком избранных материалов
+    properties:
+      materials:
+        description: Замените на конкретный тип когда будет реализовано
+        items: {}
+        type: array
+      total:
+        example: 5
+        type: integer
+    type: object
+  handlers.MarkCompleteRequest:
+    description: Запрос на отметку материала как завершенного
+    properties:
+      grade:
+        example: 4.5
+        maximum: 5
+        minimum: 1
+        type: number
+      timeSpent:
+        example: 3600
+        type: integer
+    required:
+    - grade
+    - timeSpent
+    type: object
+  handlers.MarkCompleteResponse:
+    description: Ответ на отметку материала как завершенного
+    properties:
+      materialID:
+        example: 1
+        type: integer
+      message:
+        example: Material marked as completed
+        type: string
+    type: object
+  handlers.MaterialsResponse:
+    description: Ответ с результатами поиска материалов
+    properties:
+      hasMore:
+        example: true
+        type: boolean
+      limit:
+        example: 20
+        type: integer
+      materials:
+        items:
+          $ref: '#/definitions/models.CatalogMaterial'
+        type: array
+      page:
+        example: 1
+        type: integer
+      total:
+        example: 150
+        type: integer
+    type: object
+  handlers.ProfileResponse:
+    description: Ответ с данными профиля пользователя
+    properties:
+      avatarUrl:
+        example: https://example.com/avatars/123.jpg
+        type: string
+      createdAt:
+        example: "2023-01-15T10:30:00Z"
+        type: string
+      email:
+        example: user@example.com
+        type: string
+      fullName:
+        example: Иван Иванов
+        type: string
+      id:
+        example: 123
+        type: integer
+      isVerified:
+        example: true
+        type: boolean
+      role:
+        example: teacher
+        type: string
+      specializations:
+        example:
+        - math
+        - physics
+        items:
+          type: string
+        type: array
+      updatedAt:
+        example: "2023-01-15T10:30:00Z"
+        type: string
+    type: object
+  handlers.PublishMaterialResponse:
+    description: Ответ на публикацию материала
+    properties:
+      material:
+        $ref: '#/definitions/models.Material'
+      message:
+        example: Material published successfully
+        type: string
+      shareUrl:
+        example: https://paydeya.com/share/abc123
+        type: string
+    type: object
+  handlers.RefreshTokenRequest:
+    description: Запрос на обновление токенов
+    properties:
+      refreshToken:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    required:
+    - refreshToken
+    type: object
+  handlers.ReorderBlocksRequest:
+    description: Запрос на изменение порядка блоков
+    properties:
+      blocks:
+        example:
+        - block_1
+        - block_2
+        - block_3
+        items:
+          type: string
+        type: array
+    required:
+    - blocks
+    type: object
+  handlers.ReorderBlocksResponse:
+    description: Ответ на изменение порядка блоков
+    properties:
+      message:
+        example: Blocks reordered successfully
+        type: string
+      newOrder:
+        example:
+        - block_1
+        - block_2
+        - block_3
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.SubjectsResponse:
+    description: Ответ со списком предметов
+    properties:
+      subjects:
+        items:
+          $ref: '#/definitions/models.Subject'
+        type: array
+    type: object
+  handlers.SuccessResponse:
+    description: Стандартный успешный ответ
+    properties:
+      message:
+        example: Operation completed successfully
+        type: string
+    type: object
+  handlers.TeachersResponse:
+    description: Ответ с результатами поиска преподавателей
+    properties:
+      teachers:
+        items:
+          $ref: '#/definitions/models.Teacher'
+        type: array
+    type: object
+  handlers.ToggleFavoriteRequest:
+    description: Запрос на добавление/удаление из избранного
+    properties:
+      action:
+        enum:
+        - add
+        - remove
+        example: add
+        type: string
+    required:
+    - action
+    type: object
+  handlers.ToggleFavoriteResponse:
+    description: Ответ на добавление/удаление из избранного
+    properties:
+      action:
+        example: add
+        type: string
+      materialID:
+        example: 1
+        type: integer
+      message:
+        example: Favorite updated successfully
+        type: string
+    type: object
+  handlers.UpdateProfileRequest:
+    description: Запрос на обновление профиля
+    properties:
+      fullName:
+        example: Иван Иванов
+        type: string
+      specializations:
+        example:
+        - math
+        - physics
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.UpdateProfileResponse:
+    description: Ответ на обновление профиля
+    properties:
+      data:
+        $ref: '#/definitions/handlers.UpdateProfileRequest'
+      message:
+        example: Profile updated successfully
+        type: string
+      userID:
+        example: 123
+        type: integer
+    type: object
+  handlers.UploadAvatarResponse:
+    description: Ответ на загрузку аватара
+    properties:
+      avatarUrl:
+        example: https://example.com/avatars/123.jpg
+        type: string
+      message:
+        example: Avatar uploaded successfully
+        type: string
+    type: object
+  handlers.UploadImageResponse:
+    description: Ответ на загрузку изображения
+    properties:
+      fileName:
+        example: image.jpg
+        type: string
+      height:
+        example: 1080
+        type: integer
+      message:
+        example: Image uploaded successfully
+        type: string
+      size:
+        example: 102400
+        type: integer
+      url:
+        example: https://example.com/images/abc123.jpg
+        type: string
+      width:
+        example: 1920
+        type: integer
+    type: object
+  handlers.UploadVideoResponse:
+    description: Ответ на загрузку видео
+    properties:
+      fileName:
+        example: video.mp4
+        type: string
+      message:
+        example: Video uploaded successfully
+        type: string
+      size:
+        example: 10485760
+        type: integer
+      url:
+        example: https://example.com/videos/abc123.mp4
+        type: string
+    type: object
+  handlers.UserMaterialsResponse:
+    description: Ответ со списком материалов пользователя
+    properties:
+      materials:
+        items:
+          type: string
+        type: array
+      message:
+        example: User materials endpoint
+        type: string
+      status:
+        example: draft
+        type: string
+      userID:
+        example: 123
+        type: integer
+    type: object
+  handlers.UsersListResponse:
+    description: Ответ со списком пользователей
+    properties:
+      limit:
+        example: 20
+        type: integer
+      page:
+        example: 1
+        type: integer
+      total:
+        example: 150
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/models.UserManagement'
+        type: array
+    type: object
+  models.AdminStats:
+    description: Статистика платформы для админ-панели
+    properties:
+      activeTeachers:
+        type: integer
+      publishedMaterials:
+        type: integer
+      totalMaterials:
+        type: integer
+      totalUsers:
+        type: integer
+    type: object
+  models.AnimationStep:
+    description: Шаг анимации
+    properties:
+      action:
+        description: show, hide, highlight
+        example: show
+        type: string
+      element:
+        example: element_1
+        type: string
+      style:
+        additionalProperties: true
+        type: object
+    type: object
+  models.AuthResponse:
+    description: Ответ с токенами и данными пользователя
+    properties:
+      accessToken:
+        type: string
+      message:
+        type: string
+      refreshToken:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.Author:
+    description: Автор материала
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Иван Иванов
+        type: string
+    type: object
+  models.Block:
+    description: Блок контента в материале
+    properties:
+      animation:
+        $ref: '#/definitions/models.BlockAnimation'
+      content:
+        additionalProperties: true
+        type: object
+      id:
+        example: block_123
+        type: string
+      position:
+        example: 1
+        type: integer
+      styles:
+        additionalProperties: true
+        type: object
+      type:
+        description: text, image, video, formula, quiz
+        example: text
+        type: string
+    type: object
+  models.BlockAnimation:
+    description: Анимация блока
+    properties:
+      delay:
+        example: 1000
+        type: integer
+      steps:
+        items:
+          $ref: '#/definitions/models.AnimationStep'
+        type: array
+      trigger:
+        description: click, auto
+        example: click
+        type: string
+    type: object
+  models.BlockUserRequest:
+    description: Запрос на блокировку пользователя
+    properties:
+      reason:
+        type: string
+    required:
+    - reason
+    type: object
+  models.CatalogMaterial:
+    description: Материал в каталоге
+    properties:
+      author:
+        $ref: '#/definitions/models.Author'
+      duration:
+        example: 120
+        type: integer
+      id:
+        example: 1
+        type: integer
+      level:
+        example: beginner
+        type: string
+      rating:
+        example: 4.8
+        type: number
+      studentsCount:
+        example: 150
+        type: integer
+      subject:
+        example: math
+        type: string
+      thumbnailUrl:
+        example: https://example.com/thumbnail.jpg
+        type: string
+      title:
+        example: Основы алгебры
+        type: string
+    type: object
+  models.CreateMaterialRequest:
+    description: Запрос на создание материала
+    properties:
+      subject:
+        example: math
+        type: string
+      title:
+        example: Новый материал
+        type: string
+    required:
+    - subject
+    - title
+    type: object
+  models.CreateSubjectRequest:
+    description: Запрос на создание нового предмета
+    properties:
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  models.ForgotPasswordRequest:
+    description: Запрос на сброс пароля
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  models.LoginRequest:
+    description: Запрос на вход
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.Material:
+    description: Учебный материал
+    properties:
+      access:
+        description: open, link
+        example: open
+        type: string
+      authorId:
+        example: 123
+        type: integer
+      authorName:
+        example: Иван Иванов
+        type: string
+      blocks:
+        items:
+          $ref: '#/definitions/models.Block'
+        type: array
+      createdAt:
+        example: "2023-01-15T10:30:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      shareUrl:
+        example: https://paydeya.com/share/abc123
+        type: string
+      status:
+        description: draft, published, archived
+        example: published
+        type: string
+      subject:
+        example: math
+        type: string
+      title:
+        example: Основы алгебры
+        type: string
+      updatedAt:
+        example: "2023-01-15T10:30:00Z"
+        type: string
+    type: object
+  models.ProgressMaterial:
+    description: Материал с информацией о прогрессе
+    properties:
+      id:
+        example: 1
+        type: integer
+      lastActivity:
+        example: "2023-01-15T10:30:00Z"
+        type: string
+      progress:
+        description: 0-100%
+        example: 75.5
+        type: number
+      subject:
+        example: math
+        type: string
+      title:
+        example: Основы алгебры
+        type: string
+    type: object
+  models.PublishMaterialRequest:
+    description: Запрос на публикацию материала
+    properties:
+      access:
+        description: open, link
+        example: open
+        type: string
+      visibility:
+        description: draft, published, archived
+        example: published
+        type: string
+    type: object
+  models.RegisterRequest:
+    description: Запрос на регистрацию
+    properties:
+      email:
+        type: string
+      fullName:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      role:
+        enum:
+        - student
+        - teacher
+        - admin
+        type: string
+    required:
+    - email
+    - fullName
+    - password
+    - role
+    type: object
+  models.ResetPasswordRequest:
+    description: Запрос на установку нового пароля
+    properties:
+      newPassword:
+        minLength: 6
+        type: string
+      token:
+        type: string
+    required:
+    - newPassword
+    - token
+    type: object
+  models.StudentProgress:
+    description: Прогресс обучения студента
+    properties:
+      averageGrade:
+        example: 4.2
+        type: number
+      completedTopics:
+        example: 15
+        type: integer
+      currentMaterials:
+        items:
+          $ref: '#/definitions/models.ProgressMaterial'
+        type: array
+      learningHours:
+        example: 120
+        type: integer
+      successRate:
+        example: 85.5
+        type: number
+    type: object
+  models.Subject:
+    description: Учебный предмет
+    properties:
+      icon:
+        example: "\U0001F4D0"
+        type: string
+      id:
+        example: math
+        type: string
+      name:
+        example: Математика
+        type: string
+    type: object
+  models.Teacher:
+    description: Преподаватель в каталоге
+    properties:
+      avatarUrl:
+        example: https://example.com/avatar.jpg
+        type: string
+      id:
+        example: 1
+        type: integer
+      materialsCount:
+        example: 25
+        type: integer
+      name:
+        example: Мария Петрова
+        type: string
+      rating:
+        example: 4.9
+        type: number
+      specializations:
+        example:
+        - math
+        - physics
+        items:
+          type: string
+        type: array
+    type: object
+  models.UpdateMaterialRequest:
+    description: Запрос на обновление материала
+    properties:
+      blocks:
+        items:
+          $ref: '#/definitions/models.Block'
+        type: array
+      title:
+        example: Обновленное название
+        type: string
+    type: object
+  models.User:
+    description: Модель пользователя
+    properties:
+      avatarUrl:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      fullName:
+        type: string
+      id:
+        type: integer
+      isVerified:
+        type: boolean
+      role:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.UserManagement:
+    description: Данные пользователя для управления в админ-панели
+    properties:
+      createdAt:
+        description: ← Измените на time.Time
+        type: string
+      email:
+        type: string
+      fullName:
+        type: string
+      id:
+        type: integer
+      isVerified:
+        type: boolean
+      materialsCount:
+        type: integer
+      role:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для образовательной платформы Пайдея
+  title: Paydeya Education Platform API
+  version: "1.0"
+paths:
+  /admin/statistics:
+    get:
+      description: Возвращает общую статистику платформы (пользователи, материалы,
+        преподаватели)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Статистика платформы
+          schema:
+            $ref: '#/definitions/models.AdminStats'
+        "401":
+          description: Требуется авторизация
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Доступ запрещен
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить статистику платформы
+      tags:
+      - admin
+  /admin/subjects:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый учебный предмет
+      parameters:
+      - description: Данные предмета
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateSubjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Предмет создан
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Требуется авторизация
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Доступ запрещен
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Создать предмет
+      tags:
+      - admin
+  /admin/users:
+    get:
+      description: Возвращает список пользователей с пагинацией и фильтрацией по роли
+      parameters:
+      - description: Фильтр по роли
+        enum:
+        - student
+        - teacher
+        - admin
+        in: query
+        name: role
+        type: string
+      - default: 1
+        description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Количество записей на странице
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список пользователей
+          schema:
+            $ref: '#/definitions/handlers.UsersListResponse'
+        "401":
+          description: Требуется авторизация
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Доступ запрещен
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить список пользователей
+      tags:
+      - admin
+  /admin/users/{id}/block:
+    post:
+      consumes:
+      - application/json
+      description: Блокирует пользователя по ID с указанием причины
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные для блокировки
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.BlockUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пользователь заблокирован
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Неверный запрос
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Требуется авторизация
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Доступ запрещен
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Пользователь не найден
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Заблокировать пользователя
+      tags:
+      - admin
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Отправляет инструкции по сбросу пароля на email
+      parameters:
+      - description: Email для сброса пароля
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Инструкции отправлены
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Запрос сброса пароля
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Аутентифицирует пользователя и возвращает токены
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный вход
+          schema:
+            $ref: '#/definitions/models.AuthResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Неверные учетные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Вход в систему
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Завершает сеанс пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный выход
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Выход из системы
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Обновляет access и refresh токены
+      parameters:
+      - description: Refresh токен
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Токены обновлены
+          schema:
+            $ref: '#/definitions/models.AuthResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Невалидный токен
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Обновление токенов
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Создает нового пользователя и возвращает токены
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Пользователь создан
+          schema:
+            $ref: '#/definitions/models.AuthResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Регистрация пользователя
+      tags:
+      - auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Устанавливает новый пароль по токену сброса
+      parameters:
+      - description: Данные для сброса пароля
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пароль изменен
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Неверные данные или токен
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Сброс пароля
+      tags:
+      - auth
+  /catalog/materials:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает материалы с фильтрацией и пагинацией
+      parameters:
+      - description: Поисковый запрос
+        in: query
+        name: search
+        type: string
+      - description: Фильтр по предмету
+        in: query
+        name: subject
+        type: string
+      - description: Фильтр по уровню сложности
+        in: query
+        name: level
+        type: string
+      - default: 1
+        description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Количество материалов на странице
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список материалов
+          schema:
+            $ref: '#/definitions/handlers.MaterialsResponse'
+        "400":
+          description: Неверные параметры запроса
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Поиск материалов в каталоге
+      tags:
+      - catalog
+  /catalog/subjects:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает все доступные учебные предметы
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список предметов
+          schema:
+            $ref: '#/definitions/handlers.SubjectsResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить список предметов
+      tags:
+      - catalog
+  /catalog/teachers:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает преподавателей с фильтрацией
+      parameters:
+      - description: Поисковый запрос
+        in: query
+        name: search
+        type: string
+      - description: Фильтр по предмету
+        in: query
+        name: subject
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список преподавателей
+          schema:
+            $ref: '#/definitions/handlers.TeachersResponse'
+        "400":
+          description: Неверные параметры запроса
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Поиск преподавателей
+      tags:
+      - catalog
+  /materials:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый учебный материал
+      parameters:
+      - description: Данные материала
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Материал создан
+          schema:
+            $ref: '#/definitions/handlers.CreateMaterialResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Создать материал
+      tags:
+      - materials
+  /materials/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает материал по ID
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Материал
+          schema:
+            $ref: '#/definitions/models.Material'
+        "400":
+          description: Неверный ID
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Материал не найден
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить материал
+      tags:
+      - materials
+    put:
+      consumes:
+      - application/json
+      description: Обновляет материал (только для автора)
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные для обновления
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Материал обновлен
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Доступ запрещен
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Обновить материал
+      tags:
+      - materials
+  /materials/{id}/blocks:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет блок к материалу
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные блока
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Block'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Блок добавлен
+          schema:
+            $ref: '#/definitions/handlers.AddBlockResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Добавить блок
+      tags:
+      - materials
+  /materials/{id}/blocks/{blockId}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет блок из материала
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID блока
+        in: path
+        name: blockId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Блок удален
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Удалить блок
+      tags:
+      - materials
+    put:
+      consumes:
+      - application/json
+      description: Обновляет блок материала
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID блока
+        in: path
+        name: blockId
+        required: true
+        type: string
+      - description: Данные блока
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Block'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Блок обновлен
+          schema:
+            $ref: '#/definitions/handlers.SuccessResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Обновить блок
+      tags:
+      - materials
+  /materials/{id}/publish:
+    post:
+      consumes:
+      - application/json
+      description: Публикует материал с указанными настройками видимости
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Настройки публикации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.PublishMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Материал опубликован
+          schema:
+            $ref: '#/definitions/handlers.PublishMaterialResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Опубликовать материал
+      tags:
+      - materials
+  /materials/{id}/reorder:
+    put:
+      consumes:
+      - application/json
+      description: Изменяет порядок блоков в материале
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новый порядок блоков
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ReorderBlocksRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Порядок изменен
+          schema:
+            $ref: '#/definitions/handlers.ReorderBlocksResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить порядок блоков
+      tags:
+      - materials
+  /materials/my:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает материалы текущего пользователя
+      parameters:
+      - description: Фильтр по статусу
+        enum:
+        - draft
+        - published
+        - archived
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Материалы пользователя
+          schema:
+            $ref: '#/definitions/handlers.UserMaterialsResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить материалы пользователя
+      tags:
+      - materials
+  /media/embed:
+    post:
+      consumes:
+      - application/json
+      description: Создает embed ссылку для видео с YouTube, VK и других сервисов
+      parameters:
+      - description: URL видео
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EmbedVideoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ссылка для вставки создана
+          schema:
+            $ref: '#/definitions/handlers.EmbedVideoResponse'
+        "400":
+          description: Неверный URL
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка обработки
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Вставить видео по ссылке
+      tags:
+      - media
+  /media/images:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Загружает изображение для использования в материалах
+      parameters:
+      - description: Файл изображения
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Изображение загружено
+          schema:
+            $ref: '#/definitions/handlers.UploadImageResponse'
+        "400":
+          description: Неверный файл
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка загрузки
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Загрузить изображение
+      tags:
+      - media
+  /media/videos:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Загружает видео файл для использования в материалах
+      parameters:
+      - description: Файл видео
+        in: formData
+        name: video
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Видео загружено
+          schema:
+            $ref: '#/definitions/handlers.UploadVideoResponse'
+        "400":
+          description: Неверный файл
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка загрузки
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Загрузить видео
+      tags:
+      - media
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает данные профиля текущего пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Данные профиля
+          schema:
+            $ref: '#/definitions/handlers.ProfileResponse'
+        "404":
+          description: Пользователь не найден
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить профиль пользователя
+      tags:
+      - profile
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные профиля пользователя
+      parameters:
+      - description: Данные для обновления
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Профиль обновлен
+          schema:
+            $ref: '#/definitions/handlers.UpdateProfileResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Обновить профиль
+      tags:
+      - profile
+  /profile/avatar:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Загружает аватар пользователя
+      parameters:
+      - description: Файл аватара (макс. 5MB)
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Аватар загружен
+          schema:
+            $ref: '#/definitions/handlers.UploadAvatarResponse'
+        "400":
+          description: Неверный файл
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Загрузить аватар
+      tags:
+      - profile
+  /progress:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает прогресс обучения текущего пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Прогресс обучения
+          schema:
+            $ref: '#/definitions/models.StudentProgress'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить прогресс обучения
+      tags:
+      - progress
+  /progress/favorites:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список избранных материалов пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список избранных материалов
+          schema:
+            $ref: '#/definitions/handlers.FavoritesResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить избранные материалы
+      tags:
+      - progress
+  /progress/favorites/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет или удаляет материал из избранного
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Действие с избранным
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ToggleFavoriteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Статус избранного обновлен
+          schema:
+            $ref: '#/definitions/handlers.ToggleFavoriteResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Добавить/удалить из избранного
+      tags:
+      - progress
+  /progress/materials/{id}/complete:
+    post:
+      consumes:
+      - application/json
+      description: Отмечает материал как завершенный с оценкой и временем изучения
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные завершения
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.MarkCompleteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Материал отмечен как завершенный
+          schema:
+            $ref: '#/definitions/handlers.MarkCompleteResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Отметить материал как завершенный
+      tags:
+      - progress
+securityDefinitions:
+  ApiKeyAuth:
+    description: 'Введите: Bearer {token}'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: Эндпоинты для администраторов
+  name: admin
+- description: Поиск материалов и преподавателей
+  name: catalog
+- description: Авторизация и работа с паролями
+  name: auth
+- description: Управление учебными материалами
+  name: materials
+- description: Отслеживание прогресса обучения и избранное
+  name: progress
+- description: Управление профилем пользователя
+  name: profile
+- description: Загрузка и управление медиафайлами
+  name: media

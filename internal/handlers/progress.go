@@ -17,7 +17,16 @@ func NewProgressHandler(progressService *services.ProgressService) *ProgressHand
     return &ProgressHandler{progressService: progressService}
 }
 
-// GetProgress возвращает прогресс ученика
+// GetProgress godoc
+// @Summary Получить прогресс обучения
+// @Description Возвращает прогресс обучения текущего пользователя
+// @Tags progress
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.StudentProgress "Прогресс обучения"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /progress [get]
 func (h *ProgressHandler) GetProgress(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -30,7 +39,19 @@ func (h *ProgressHandler) GetProgress(c *gin.Context) {
     c.JSON(http.StatusOK, progress)
 }
 
-// MarkMaterialComplete отмечает материал как завершенный
+// MarkMaterialComplete godoc
+// @Summary Отметить материал как завершенный
+// @Description Отмечает материал как завершенный с оценкой и временем изучения
+// @Tags progress
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "ID материала"
+// @Param input body MarkCompleteRequest true "Данные завершения"
+// @Success 200 {object} MarkCompleteResponse "Материал отмечен как завершенный"
+// @Failure 400 {object} ErrorResponse "Неверные данные"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /progress/materials/{id}/complete [post]
 func (h *ProgressHandler) MarkMaterialComplete(c *gin.Context) {
     userID := c.GetInt("userID")
     materialID, err := strconv.Atoi(c.Param("id"))
@@ -39,11 +60,7 @@ func (h *ProgressHandler) MarkMaterialComplete(c *gin.Context) {
         return
     }
 
-    var req struct {
-        TimeSpent int     `json:"timeSpent" binding:"required"`
-        Grade     float64 `json:"grade" binding:"required,min=1,max=5"`
-    }
-
+    var req MarkCompleteRequest
     if err := c.ShouldBindJSON(&req); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
@@ -61,7 +78,16 @@ func (h *ProgressHandler) MarkMaterialComplete(c *gin.Context) {
     })
 }
 
-// GetFavorites возвращает избранные материалы
+// GetFavorites godoc
+// @Summary Получить избранные материалы
+// @Description Возвращает список избранных материалов пользователя
+// @Tags progress
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} FavoritesResponse "Список избранных материалов"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /progress/favorites [get]
 func (h *ProgressHandler) GetFavorites(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -77,7 +103,19 @@ func (h *ProgressHandler) GetFavorites(c *gin.Context) {
     })
 }
 
-// ToggleFavorite добавляет/удаляет материал из избранного
+// ToggleFavorite godoc
+// @Summary Добавить/удалить из избранного
+// @Description Добавляет или удаляет материал из избранного
+// @Tags progress
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "ID материала"
+// @Param input body ToggleFavoriteRequest true "Действие с избранным"
+// @Success 200 {object} ToggleFavoriteResponse "Статус избранного обновлен"
+// @Failure 400 {object} ErrorResponse "Неверные данные"
+// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Router /progress/favorites/{id} [post]
 func (h *ProgressHandler) ToggleFavorite(c *gin.Context) {
     userID := c.GetInt("userID")
     materialID, err := strconv.Atoi(c.Param("id"))
@@ -86,10 +124,7 @@ func (h *ProgressHandler) ToggleFavorite(c *gin.Context) {
         return
     }
 
-    var req struct {
-        Action string `json:"action" binding:"required,oneof=add remove"`
-    }
-
+    var req ToggleFavoriteRequest
     if err := c.ShouldBindJSON(&req); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
@@ -107,3 +142,41 @@ func (h *ProgressHandler) ToggleFavorite(c *gin.Context) {
         "materialID": materialID,
     })
 }
+
+// Request/Response models for Swagger
+
+// MarkCompleteRequest represents mark material complete request
+// @Description Запрос на отметку материала как завершенного
+type MarkCompleteRequest struct {
+    TimeSpent int     `json:"timeSpent" binding:"required" example:"3600"`
+    Grade     float64 `json:"grade" binding:"required,min=1,max=5" example:"4.5"`
+}
+
+// MarkCompleteResponse represents mark material complete response
+// @Description Ответ на отметку материала как завершенного
+type MarkCompleteResponse struct {
+    Message    string `json:"message" example:"Material marked as completed"`
+    MaterialID int    `json:"materialID" example:"1"`
+}
+
+// ToggleFavoriteRequest represents toggle favorite request
+// @Description Запрос на добавление/удаление из избранного
+type ToggleFavoriteRequest struct {
+    Action string `json:"action" binding:"required,oneof=add remove" example:"add"`
+}
+
+// ToggleFavoriteResponse represents toggle favorite response
+// @Description Ответ на добавление/удаление из избранного
+type ToggleFavoriteResponse struct {
+    Message    string `json:"message" example:"Favorite updated successfully"`
+    Action     string `json:"action" example:"add"`
+    MaterialID int    `json:"materialID" example:"1"`
+}
+
+// FavoritesResponse represents favorites list response
+// @Description Ответ со списком избранных материалов
+type FavoritesResponse struct {
+    Materials []interface{} `json:"materials"` // Замените на конкретный тип когда будет реализовано
+    Total     int           `json:"total" example:"5"`
+}
+

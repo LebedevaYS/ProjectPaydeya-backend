@@ -6,6 +6,7 @@ import (
     "os"
     "strconv"
     "fmt"
+    _ "paydeya-backend/docs"
 
     "paydeya-backend/internal/database"
     "paydeya-backend/internal/handlers"
@@ -60,6 +61,32 @@ func runMigrations() error {
     }
     return nil
 }
+
+// @title Paydeya Education Platform API
+// @version 1.0
+// @description API для образовательной платформы Пайдея
+// @host localhost:8080
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description Введите: Bearer {token}
+
+// @tag.name admin
+// @tag.description Эндпоинты для администраторов
+// @tag.name catalog
+// @tag.description Поиск материалов и преподавателей
+// @tag.name auth
+// @tag.description Авторизация и работа с паролями
+// @tag.name materials
+// @tag.description Управление учебными материалами
+// @tag.name progress
+// @tag.description Отслеживание прогресса обучения и избранное
+// @tag.name profile
+// @tag.description Управление профилем пользователя
+// @tag.name media
+// @tag.description Загрузка и управление медиафайлами
 func main() {
  // Загружаем .env файл локально
     if err := godotenv.Load(); err != nil {
@@ -220,6 +247,56 @@ func main() {
         catalog.GET("/teachers", catalogHandler.SearchTeachers)
     }
 
+    router.GET("/swagger.json", func(c *gin.Context) {
+        c.Header("Content-Type", "application/json; charset=utf-8") // ← ДОБАВЬТЕ ЭТУ СТРОЧКУ
+        c.File("./docs/swagger.json")
+    })
+
+    router.GET("/docs", func(c *gin.Context) {
+        html := `<!DOCTYPE html>
+<html>
+<head>
+    <title>Paydeya API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@3/swagger-ui.css">
+    <style>
+         body { margin: 0; padding: 20px; background: #f5f5f5; }
+         #swagger-ui { max-width: 1200px; margin: 0 auto; }
+
+         #swagger-ui * {
+             font-weight: normal !important;
+         }
+
+         /* Оставляем немного жирного для самой важной структуры */
+         .opblock-tag {
+             font-weight: 600 !important;
+         }
+
+         h1 {
+             font-weight: 600 !important;
+         }
+     </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+    <script>
+        SwaggerUIBundle({
+            url: '/swagger.json',
+            dom_id: '#swagger-ui',
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIBundle.presets.standalone
+            ],
+            layout: "BaseLayout",
+            deepLinking: true,
+            showExtensions: true,
+            showCommonExtensions: true
+        });
+    </script>
+</body>
+</html>`
+        c.Data(200, "text/html; charset=utf-8", []byte(html))
+    })
 
 
     port := os.Getenv("PORT")
