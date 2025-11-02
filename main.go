@@ -7,6 +7,11 @@ import (
     "strconv"
     "fmt"
     _ "paydeya-backend/docs"
+    "time"  // ← ДОБАВЬТЕ ЭТОТ
+    "github.com/gin-contrib/cors"  // ← ДОБАВЬТЕ ЭТОТ
+    "github.com/gin-gonic/gin"
+    "github.com/swaggo/files"      // ← ДОБАВЬТЕ ЭТОТ
+    ginSwagger "github.com/swaggo/gin-swagger"
 
     "paydeya-backend/internal/database"
     "paydeya-backend/internal/handlers"
@@ -15,7 +20,6 @@ import (
     "paydeya-backend/internal/middleware"
 
 
-    "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
 )
 
@@ -159,21 +163,16 @@ func main() {
         gin.SetMode(gin.ReleaseMode)
     }
 
+    // CORS middleware
     router := gin.Default()
 
-    // CORS middleware
-    router.Use(func(c *gin.Context) {
-        c.Header("Access-Control-Allow-Origin", "*")
-        c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
-
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
-
-        c.Next()
-    })
+    config := cors.DefaultConfig()
+    config.AllowAllOrigins = true
+    config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"}
+    config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"}
+    config.AllowCredentials = true
+    config.MaxAge = 12 * time.Hour
+    router.Use(cors.New(config))
 
     router.GET("/debug/routes", func(c *gin.Context) {
         routes := router.Routes()
@@ -251,6 +250,8 @@ func main() {
         c.Header("Content-Type", "application/json; charset=utf-8") // ← ДОБАВЬТЕ ЭТУ СТРОЧКУ
         c.File("./docs/swagger.json")
     })
+
+    router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger.json")))
 
     router.GET("/docs", func(c *gin.Context) {
         html := `<!DOCTYPE html>
