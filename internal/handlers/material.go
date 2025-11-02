@@ -60,6 +60,7 @@ func (h *MaterialHandler) CreateMaterial(c *gin.Context) {
 // @Tags materials
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path int true "ID материала"
 // @Success 200 {object} models.Material "Материал"
 // @Failure 400 {object} ErrorResponse "Неверный ID"
@@ -138,20 +139,25 @@ func (h *MaterialHandler) UpdateMaterial(c *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param status query string false "Фильтр по статусу" Enums(draft, published, archived)
-// @Success 200 {object} UserMaterialsResponse "Материалы пользователя"
+// @Success 200 {object} models.UserMaterialsResponse "Материалы пользователя"
 // @Failure 500 {object} ErrorResponse "Ошибка сервера"
 // @Router /materials/my [get]
 func (h *MaterialHandler) GetUserMaterials(c *gin.Context) {
-    userID := c.GetInt("userID")
-    status := c.Query("status") // draft, published, archived
+     userID := c.GetInt("userID")
+        status := c.Query("status") // draft, published, archived
 
-    // TODO: реализовать в сервисе
-    c.JSON(http.StatusOK, gin.H{
-        "message": "User materials endpoint",
-        "userID":  userID,
-        "status":  status,
-        "materials": []string{}, // заглушка
-    })
+        materials, err := h.materialService.GetUserMaterials(c.Request.Context(), userID, status)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user materials"})
+            return
+        }
+
+        c.JSON(http.StatusOK, gin.H{
+            "materials": materials,
+            "total":     len(materials),
+            "userID":    userID,
+            "status":    status,
+        })
 }
 
 // PublishMaterial godoc
@@ -331,7 +337,7 @@ func (h *MaterialHandler) DeleteBlock(c *gin.Context) {
 // @Success 200 {object} ReorderBlocksResponse "Порядок изменен"
 // @Failure 400 {object} ErrorResponse "Неверные данные"
 // @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /materials/{id}/reorder [put]
+// @Router /materials/{id}/blocks/reorder [post]
 func (h *MaterialHandler) ReorderBlocks(c *gin.Context) {
     userID := c.GetInt("userID")
     materialID, err := strconv.Atoi(c.Param("id"))
@@ -357,6 +363,7 @@ func (h *MaterialHandler) ReorderBlocks(c *gin.Context) {
         "newOrder": req.Blocks,
     })
 }
+
 
 // Вспомогательная функция для генерации хеша
 func generateUniqueHash() string {

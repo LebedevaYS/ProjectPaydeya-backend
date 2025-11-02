@@ -82,7 +82,7 @@ func (h *ProfileHandler) GetProfile(c *gin.Context) {
 // @Success 200 {object} UpdateProfileResponse "Профиль обновлен"
 // @Failure 400 {object} ErrorResponse "Неверные данные"
 // @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /profile [put]
+// @Router /profile [patch]
 func (h *ProfileHandler) UpdateProfile(c *gin.Context) {
     userID := c.GetInt("userID")
 

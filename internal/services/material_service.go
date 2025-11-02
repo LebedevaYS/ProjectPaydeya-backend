@@ -58,6 +58,11 @@ func (s *MaterialService) GetMaterial(ctx context.Context, materialID int) (*mod
     return material, nil
 }
 
+// GetUserMaterials возвращает материалы пользователя
+func (s *MaterialService) GetUserMaterials(ctx context.Context, userID int, status string) ([]*models.Material, error) {
+    return s.materialRepo.GetUserMaterials(ctx, userID, status)
+}
+
 // UpdateMaterial обновляет материал и блоки
 func (s *MaterialService) UpdateMaterial(ctx context.Context, userID int, materialID int, req *models.UpdateMaterialRequest) error {
     // Получаем текущий материал для проверки прав
@@ -119,6 +124,8 @@ func (s *MaterialService) PublishMaterial(ctx context.Context, userID, materialI
     return material, nil
 }
 
+
+
 // generateShareURL генерирует уникальный URL для доступа по ссылке
 func (s *MaterialService) generateShareURL() string {
     bytes := make([]byte, 8)
@@ -152,6 +159,7 @@ func (s *MaterialService) AddBlock(ctx context.Context, userID, materialID int, 
 
 // UpdateBlock обновляет блок
 func (s *MaterialService) UpdateBlock(ctx context.Context, userID, materialID int, blockID string, block *models.Block) error {
+
     // Проверяем права
     material, err := s.materialRepo.GetMaterial(ctx, materialID)
     if err != nil || material == nil {
@@ -204,6 +212,23 @@ func (s *MaterialService) DeleteBlock(ctx context.Context, userID, materialID in
     }
 
     return s.blockRepo.SaveBlocks(ctx, materialID, newBlocks)
+}
+
+// Вспомогательные функции
+func getMapKeys(m map[string]models.Block) []string {
+    keys := make([]string, 0, len(m))
+    for k := range m {
+        keys = append(keys, k)
+    }
+    return keys
+}
+
+func getBlockIDs(blocks []models.Block) []string {
+    ids := make([]string, 0, len(blocks))
+    for _, block := range blocks {
+        ids = append(ids, block.ID)
+    }
+    return ids
 }
 
 // ReorderBlocks изменяет порядок блоков

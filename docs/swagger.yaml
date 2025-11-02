@@ -317,23 +317,6 @@ definitions:
         example: https://example.com/videos/abc123.mp4
         type: string
     type: object
-  handlers.UserMaterialsResponse:
-    description: Ответ со списком материалов пользователя
-    properties:
-      materials:
-        items:
-          type: string
-        type: array
-      message:
-        example: User materials endpoint
-        type: string
-      status:
-        example: draft
-        type: string
-      userID:
-        example: 123
-        type: integer
-    type: object
   handlers.UsersListResponse:
     description: Ответ со списком пользователей
     properties:
@@ -700,6 +683,8 @@ definitions:
     properties:
       avatarUrl:
         type: string
+      blockReason:
+        type: string
       createdAt:
         type: string
       email:
@@ -708,6 +693,8 @@ definitions:
         type: string
       id:
         type: integer
+      isBlocked:
+        type: boolean
       isVerified:
         type: boolean
       role:
@@ -718,8 +705,10 @@ definitions:
   models.UserManagement:
     description: Данные пользователя для управления в админ-панели
     properties:
+      blockReason:
+        example: Нарушение правил
+        type: string
       createdAt:
-        description: ← Измените на time.Time
         type: string
       email:
         type: string
@@ -727,12 +716,32 @@ definitions:
         type: string
       id:
         type: integer
+      isBlocked:
+        example: false
+        type: boolean
       isVerified:
         type: boolean
       materialsCount:
         type: integer
       role:
         type: string
+    type: object
+  models.UserMaterialsResponse:
+    description: Ответ со списком материалов пользователя
+    properties:
+      materials:
+        items:
+          $ref: '#/definitions/models.Material'
+        type: array
+      status:
+        example: draft
+        type: string
+      total:
+        example: 5
+        type: integer
+      userID:
+        example: 123
+        type: integer
     type: object
 host: localhost:8080
 info:
@@ -1242,6 +1251,8 @@ paths:
           description: Ошибка сервера
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Получить материал
       tags:
       - materials
@@ -1399,6 +1410,43 @@ paths:
       summary: Обновить блок
       tags:
       - materials
+  /materials/{id}/blocks/reorder:
+    post:
+      consumes:
+      - application/json
+      description: Изменяет порядок блоков в материале
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новый порядок блоков
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ReorderBlocksRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Порядок изменен
+          schema:
+            $ref: '#/definitions/handlers.ReorderBlocksResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить порядок блоков
+      tags:
+      - materials
   /materials/{id}/publish:
     post:
       consumes:
@@ -1436,43 +1484,6 @@ paths:
       summary: Опубликовать материал
       tags:
       - materials
-  /materials/{id}/reorder:
-    put:
-      consumes:
-      - application/json
-      description: Изменяет порядок блоков в материале
-      parameters:
-      - description: ID материала
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Новый порядок блоков
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.ReorderBlocksRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Порядок изменен
-          schema:
-            $ref: '#/definitions/handlers.ReorderBlocksResponse'
-        "400":
-          description: Неверные данные
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "500":
-          description: Ошибка сервера
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить порядок блоков
-      tags:
-      - materials
   /materials/my:
     get:
       consumes:
@@ -1493,7 +1504,7 @@ paths:
         "200":
           description: Материалы пользователя
           schema:
-            $ref: '#/definitions/handlers.UserMaterialsResponse'
+            $ref: '#/definitions/models.UserMaterialsResponse'
         "500":
           description: Ошибка сервера
           schema:
@@ -1622,7 +1633,7 @@ paths:
       summary: Получить профиль пользователя
       tags:
       - profile
-    put:
+    patch:
       consumes:
       - application/json
       description: Обновляет данные профиля пользователя
@@ -1684,28 +1695,7 @@ paths:
       summary: Загрузить аватар
       tags:
       - profile
-  /progress:
-    get:
-      consumes:
-      - application/json
-      description: Возвращает прогресс обучения текущего пользователя
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Прогресс обучения
-          schema:
-            $ref: '#/definitions/models.StudentProgress'
-        "500":
-          description: Ошибка сервера
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Получить прогресс обучения
-      tags:
-      - progress
-  /progress/favorites:
+  /student/favorites:
     get:
       consumes:
       - application/json
@@ -1726,7 +1716,44 @@ paths:
       summary: Получить избранные материалы
       tags:
       - progress
-  /progress/favorites/{id}:
+  /student/materials/{id}/complete:
+    post:
+      consumes:
+      - application/json
+      description: Отмечает материал как завершенный с оценкой и временем изучения
+      parameters:
+      - description: ID материала
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные завершения
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.MarkCompleteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Материал отмечен как завершенный
+          schema:
+            $ref: '#/definitions/handlers.MarkCompleteResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Отметить материал как завершенный
+      tags:
+      - progress
+  /student/materials/{id}/favorite:
     post:
       consumes:
       - application/json
@@ -1763,41 +1790,25 @@ paths:
       summary: Добавить/удалить из избранного
       tags:
       - progress
-  /progress/materials/{id}/complete:
-    post:
+  /student/progress:
+    get:
       consumes:
       - application/json
-      description: Отмечает материал как завершенный с оценкой и временем изучения
-      parameters:
-      - description: ID материала
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Данные завершения
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.MarkCompleteRequest'
+      description: Возвращает прогресс обучения текущего пользователя
       produces:
       - application/json
       responses:
         "200":
-          description: Материал отмечен как завершенный
+          description: Прогресс обучения
           schema:
-            $ref: '#/definitions/handlers.MarkCompleteResponse'
-        "400":
-          description: Неверные данные
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/models.StudentProgress'
         "500":
           description: Ошибка сервера
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Отметить материал как завершенный
+      summary: Получить прогресс обучения
       tags:
       - progress
 securityDefinitions:

@@ -67,3 +67,12 @@ type PublishMaterialRequest struct {
     Visibility string `json:"visibility" example:"published"` // draft, published, archived
     Access     string `json:"access" example:"open"`     // open, link
 }
+
+// UserMaterialsResponse represents user materials response
+// @Description Ответ со списком материалов пользователя
+type UserMaterialsResponse struct {
+    Materials []*Material `json:"materials"`
+    Total     int                `json:"total" example:"5"`
+    UserID    int                `json:"userID" example:"123"`
+    Status    string             `json:"status,omitempty" example:"draft"`
+}

@@ -3,6 +3,7 @@ package handlers
 import (
     "net/http"
     "strconv"
+    "fmt"
 
     "paydeya-backend/internal/services"
 
@@ -26,7 +27,7 @@ func NewProgressHandler(progressService *services.ProgressService) *ProgressHand
 // @Security ApiKeyAuth
 // @Success 200 {object} models.StudentProgress "Прогресс обучения"
 // @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /progress [get]
+// @Router /student/progress [get]
 func (h *ProgressHandler) GetProgress(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -51,7 +52,7 @@ func (h *ProgressHandler) GetProgress(c *gin.Context) {
 // @Success 200 {object} MarkCompleteResponse "Материал отмечен как завершенный"
 // @Failure 400 {object} ErrorResponse "Неверные данные"
 // @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /progress/materials/{id}/complete [post]
+// @Router /student/materials/{id}/complete [post]
 func (h *ProgressHandler) MarkMaterialComplete(c *gin.Context) {
     userID := c.GetInt("userID")
     materialID, err := strconv.Atoi(c.Param("id"))
@@ -87,8 +88,8 @@ func (h *ProgressHandler) MarkMaterialComplete(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Success 200 {object} FavoritesResponse "Список избранных материалов"
 // @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /progress/favorites [get]
-func (h *ProgressHandler) GetFavorites(c *gin.Context) {
+// @Router /student/favorites [get]
+/*func (h *ProgressHandler) GetFavorites(c *gin.Context) {
     userID := c.GetInt("userID")
 
     materials, err := h.progressService.GetFavoriteMaterials(c.Request.Context(), userID)
@@ -96,6 +97,25 @@ func (h *ProgressHandler) GetFavorites(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get favorites"})
         return
     }
+
+    c.JSON(http.StatusOK, gin.H{
+        "materials": materials,
+        "total":     len(materials),
+    })
+}*/
+func (h *ProgressHandler) GetFavorites(c *gin.Context) {
+    userID := c.GetInt("userID")
+
+    fmt.Printf("GetFavorites: userID=%d\n", userID)
+
+    materials, err := h.progressService.GetFavoriteMaterials(c.Request.Context(), userID)
+    if err != nil {
+        fmt.Printf("GetFavorites error: %v\n", err) // ← Добавьте это
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get favorites"})
+        return
+    }
+
+    fmt.Printf("GetFavorites success: found %d materials\n", len(materials))
 
     c.JSON(http.StatusOK, gin.H{
         "materials": materials,
@@ -115,7 +135,7 @@ func (h *ProgressHandler) GetFavorites(c *gin.Context) {
 // @Success 200 {object} ToggleFavoriteResponse "Статус избранного обновлен"
 // @Failure 400 {object} ErrorResponse "Неверные данные"
 // @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /progress/favorites/{id} [post]
+// @Router /student/materials/{id}/favorite [post]
 func (h *ProgressHandler) ToggleFavorite(c *gin.Context) {
     userID := c.GetInt("userID")
     materialID, err := strconv.Atoi(c.Param("id"))

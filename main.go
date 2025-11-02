@@ -81,7 +81,7 @@ func runMigrations() error {
 // @tag.description Авторизация и работа с паролями
 // @tag.name materials
 // @tag.description Управление учебными материалами
-// @tag.name progress
+// @tag.name student
 // @tag.description Отслеживание прогресса обучения и избранное
 // @tag.name profile
 // @tag.description Управление профилем пользователя
@@ -209,7 +209,7 @@ func main() {
         protected.POST("/profile/avatar", profileHandler.UploadAvatar)
 
         protected.POST("/materials", materialHandler.CreateMaterial)
-        protected.GET("/materials", materialHandler.GetUserMaterials)
+        protected.GET("/materials/my", materialHandler.GetUserMaterials)
         protected.GET("/materials/:id", materialHandler.GetMaterial)
         protected.PUT("/materials/:id", materialHandler.UpdateMaterial)
         protected.POST("/materials/:id/publish", materialHandler.PublishMaterial)

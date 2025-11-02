@@ -776,7 +776,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Материалы пользователя",
                         "schema": {
-                            "$ref": "#/definitions/handlers.UserMaterialsResponse"
+                            "$ref": "#/definitions/models.UserMaterialsResponse"
                         }
                     },
                     "500": {
@@ -790,6 +790,11 @@ const docTemplate = `{
         },
         "/materials/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Возвращает материал по ID",
                 "consumes": [
                     "application/json"
@@ -941,6 +946,64 @@ const docTemplate = `{
                         "description": "Блок добавлен",
                         "schema": {
                             "$ref": "#/definitions/handlers.AddBlockResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/materials/{id}/blocks/reorder": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Изменяет порядок блоков в материале",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "materials"
+                ],
+                "summary": "Изменить порядок блоков",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новый порядок блоков",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ReorderBlocksRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Порядок изменен",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ReorderBlocksResponse"
                         }
                     },
                     "400": {
@@ -1118,64 +1181,6 @@ const docTemplate = `{
                         "description": "Материал опубликован",
                         "schema": {
                             "$ref": "#/definitions/handlers.PublishMaterialResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Неверные данные",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/materials/{id}/reorder": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Изменяет порядок блоков в материале",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "materials"
-                ],
-                "summary": "Изменить порядок блоков",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID материала",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Новый порядок блоков",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ReorderBlocksRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Порядок изменен",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ReorderBlocksResponse"
                         }
                     },
                     "400": {
@@ -1381,7 +1386,7 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -1480,41 +1485,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/progress": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Возвращает прогресс обучения текущего пользователя",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "progress"
-                ],
-                "summary": "Получить прогресс обучения",
-                "responses": {
-                    "200": {
-                        "description": "Прогресс обучения",
-                        "schema": {
-                            "$ref": "#/definitions/models.StudentProgress"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/progress/favorites": {
+        "/student/favorites": {
             "get": {
                 "security": [
                     {
@@ -1548,7 +1519,65 @@ const docTemplate = `{
                 }
             }
         },
-        "/progress/favorites/{id}": {
+        "/student/materials/{id}/complete": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Отмечает материал как завершенный с оценкой и временем изучения",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "progress"
+                ],
+                "summary": "Отметить материал как завершенный",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID материала",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные завершения",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MarkCompleteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Материал отмечен как завершенный",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MarkCompleteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/materials/{id}/favorite": {
             "post": {
                 "security": [
                     {
@@ -1606,14 +1635,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/progress/materials/{id}/complete": {
-            "post": {
+        "/student/progress": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Отмечает материал как завершенный с оценкой и временем изучения",
+                "description": "Возвращает прогресс обучения текущего пользователя",
                 "consumes": [
                     "application/json"
                 ],
@@ -1623,36 +1652,12 @@ const docTemplate = `{
                 "tags": [
                     "progress"
                 ],
-                "summary": "Отметить материал как завершенный",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID материала",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Данные завершения",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.MarkCompleteRequest"
-                        }
-                    }
-                ],
+                "summary": "Получить прогресс обучения",
                 "responses": {
                     "200": {
-                        "description": "Материал отмечен как завершенный",
+                        "description": "Прогресс обучения",
                         "schema": {
-                            "$ref": "#/definitions/handlers.MarkCompleteResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Неверные данные",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/models.StudentProgress"
                         }
                     },
                     "500": {
@@ -2107,30 +2112,6 @@ const docTemplate = `{
                 "url": {
                     "type": "string",
                     "example": "https://example.com/videos/abc123.mp4"
-                }
-            }
-        },
-        "handlers.UserMaterialsResponse": {
-            "description": "Ответ со списком материалов пользователя",
-            "type": "object",
-            "properties": {
-                "materials": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "message": {
-                    "type": "string",
-                    "example": "User materials endpoint"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "draft"
-                },
-                "userID": {
-                    "type": "integer",
-                    "example": 123
                 }
             }
         },
@@ -2645,6 +2626,9 @@ const docTemplate = `{
                 "avatarUrl": {
                     "type": "string"
                 },
+                "blockReason": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -2656,6 +2640,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "isBlocked": {
+                    "type": "boolean"
                 },
                 "isVerified": {
                     "type": "boolean"
@@ -2672,8 +2659,11 @@ const docTemplate = `{
             "description": "Данные пользователя для управления в админ-панели",
             "type": "object",
             "properties": {
+                "blockReason": {
+                    "type": "string",
+                    "example": "Нарушение правил"
+                },
                 "createdAt": {
-                    "description": "← Измените на time.Time",
                     "type": "string"
                 },
                 "email": {
@@ -2685,6 +2675,10 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isBlocked": {
+                    "type": "boolean",
+                    "example": false
+                },
                 "isVerified": {
                     "type": "boolean"
                 },
@@ -2693,6 +2687,30 @@ const docTemplate = `{
                 },
                 "role": {
                     "type": "string"
+                }
+            }
+        },
+        "models.UserMaterialsResponse": {
+            "description": "Ответ со списком материалов пользователя",
+            "type": "object",
+            "properties": {
+                "materials": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Material"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "example": "draft"
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "userID": {
+                    "type": "integer",
+                    "example": 123
                 }
             }
         }
