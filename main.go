@@ -69,8 +69,9 @@ func runMigrations() error {
 // @title Paydeya Education Platform API
 // @version 1.0
 // @description API для образовательной платформы Пайдея
-// @host localhost:8080
+// @host paydeya-backend.onrender.com
 // @BasePath /api/v1
+// @schemes https
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
@@ -251,7 +252,12 @@ func main() {
         c.File("./docs/swagger.json")
     })
 
-    router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger.json")))
+    //router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger.json")))
+
+    router.GET("/docs/*any", ginSwagger.WrapHandler(
+        swaggerFiles.Handler,
+        ginSwagger.URL("https://paydeya-backend.onrender.com/swagger.json"), // ← ДОБАВЬТЕ ЭТОТ ПАРАМЕТР
+    ))
 
     router.GET("/docs", func(c *gin.Context) {
         html := `<!DOCTYPE html>

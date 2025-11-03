@@ -1,4 +1,7 @@
 {
+    "schemes": [
+        "https"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "API для образовательной платформы Пайдея",
@@ -6,7 +9,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "paydeya-backend.onrender.com",
     "basePath": "/api/v1",
     "paths": {
         "/admin/statistics": {
@@ -2736,7 +2739,7 @@
         },
         {
             "description": "Отслеживание прогресса обучения и избранное",
-            "name": "progress"
+            "name": "student"
         },
         {
             "description": "Управление профилем пользователя",

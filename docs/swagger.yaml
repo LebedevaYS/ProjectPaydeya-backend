@@ -743,7 +743,7 @@ definitions:
         example: 123
         type: integer
     type: object
-host: localhost:8080
+host: paydeya-backend.onrender.com
 info:
   contact: {}
   description: API для образовательной платформы Пайдея
@@ -1811,6 +1811,8 @@ paths:
       summary: Получить прогресс обучения
       tags:
       - progress
+schemes:
+- https
 securityDefinitions:
   ApiKeyAuth:
     description: 'Введите: Bearer {token}'
@@ -1828,7 +1830,7 @@ tags:
 - description: Управление учебными материалами
   name: materials
 - description: Отслеживание прогресса обучения и избранное
-  name: progress
+  name: student
 - description: Управление профилем пользователя
   name: profile
 - description: Загрузка и управление медиафайлами

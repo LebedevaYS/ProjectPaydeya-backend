@@ -2742,7 +2742,7 @@ const docTemplate = `{
         },
         {
             "description": "Отслеживание прогресса обучения и избранное",
-            "name": "progress"
+            "name": "student"
         },
         {
             "description": "Управление профилем пользователя",
@@ -2758,9 +2758,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "paydeya-backend.onrender.com",
 	BasePath:         "/api/v1",
-	Schemes:          []string{},
+	Schemes:          []string{"https"},
 	Title:            "Paydeya Education Platform API",
 	Description:      "API для образовательной платформы Пайдея",
 	InfoInstanceName: "swagger",
