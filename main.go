@@ -72,12 +72,12 @@ func runMigrations() error {
 // @BasePath /api/v1
 
 // Для разработки:
-// @host localhost:8080
-// @schemes http
+// host localhost:8080
+// schemes http
 
 // Для продакшена (закомментировать выше и раскомментировать ниже):
-// host paydeya-backend.onrender.com
-// schemes https
+// @host paydeya-backend.onrender.com
+// @schemes https
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
