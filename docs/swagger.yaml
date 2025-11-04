@@ -834,7 +834,7 @@ definitions:
         example: 123
         type: integer
     type: object
-host: localhost:8080
+host: paydeya-backend.onrender.com
 info:
   contact: {}
   description: API для образовательной платформы Пайдея
@@ -1907,7 +1907,7 @@ paths:
       tags:
       - progress
 schemes:
-- http
+- https
 securityDefinitions:
   ApiKeyAuth:
     description: 'Введите: Bearer {token}'
