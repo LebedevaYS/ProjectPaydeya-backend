@@ -69,9 +69,15 @@ func runMigrations() error {
 // @title Paydeya Education Platform API
 // @version 1.0
 // @description API для образовательной платформы Пайдея
-// @host paydeya-backend.onrender.com
 // @BasePath /api/v1
-// @schemes https
+
+// Для разработки:
+// @host localhost:8080
+// @schemes http
+
+// Для продакшена (закомментировать выше и раскомментировать ниже):
+// host paydeya-backend.onrender.com
+// schemes https
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header

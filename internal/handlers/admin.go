@@ -25,9 +25,9 @@ func NewAdminHandler(adminService *services.AdminService) *AdminHandler {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} models.AdminStats "Статистика платформы"
-// @Failure 401 {object} ErrorResponse "Требуется авторизация"
-// @Failure 403 {object} ErrorResponse "Доступ запрещен"
-// @Failure 500 {object} ErrorResponse "Внутренняя ошибка сервера"
+// @Failure 401 {object} AuthErrorResponse "Требуется авторизация"
+// @Failure 403 {object} ForbiddenErrorResponse "Доступ запрещен"
+// @Failure 500 {object} InternalErrorResponse "Внутренняя ошибка сервера"
 // @Router /admin/statistics [get]
 func (h *AdminHandler) GetStatistics(c *gin.Context) {
     stats, err := h.adminService.GetPlatformStats(c.Request.Context())
@@ -49,9 +49,9 @@ func (h *AdminHandler) GetStatistics(c *gin.Context) {
 // @Param page query int false "Номер страницы" default(1)
 // @Param limit query int false "Количество записей на странице" default(20)
 // @Success 200 {object} UsersListResponse "Список пользователей"
-// @Failure 401 {object} ErrorResponse "Требуется авторизация"
-// @Failure 403 {object} ErrorResponse "Доступ запрещен"
-// @Failure 500 {object} ErrorResponse "Внутренняя ошибка сервера"
+// @Failure 401 {object} AuthErrorResponse "Требуется авторизация"
+// @Failure 403 {object} ForbiddenErrorResponse "Доступ запрещен"
+// @Failure 500 {object} InternalErrorResponse "Внутренняя ошибка сервера"
 // @Router /admin/users [get]
 func (h *AdminHandler) GetUsers(c *gin.Context) {
     role := c.Query("role")
@@ -89,11 +89,11 @@ func (h *AdminHandler) GetUsers(c *gin.Context) {
 // @Param id path int true "ID пользователя"
 // @Param input body models.BlockUserRequest true "Данные для блокировки"
 // @Success 200 {object} SuccessResponse "Пользователь заблокирован"
-// @Failure 400 {object} ErrorResponse "Неверный запрос"
-// @Failure 401 {object} ErrorResponse "Требуется авторизация"
-// @Failure 403 {object} ErrorResponse "Доступ запрещен"
-// @Failure 404 {object} ErrorResponse "Пользователь не найден"
-// @Failure 500 {object} ErrorResponse "Внутренняя ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 401 {object} AuthErrorResponse "Требуется авторизация"
+// @Failure 403 {object} ForbiddenErrorResponse "Доступ запрещен"
+// @Failure 404 {object} UserNotFoundErrorResponse "Пользователь не найден"
+// @Failure 500 {object} InternalErrorResponse "Внутренняя ошибка сервера"
 // @Router /admin/users/{id}/block [post]
 func (h *AdminHandler) BlockUser(c *gin.Context) {
     userID, err := strconv.Atoi(c.Param("id"))
@@ -129,10 +129,10 @@ func (h *AdminHandler) BlockUser(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Param input body models.CreateSubjectRequest true "Данные предмета"
 // @Success 200 {object} SuccessResponse "Предмет создан"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 401 {object} ErrorResponse "Требуется авторизация"
-// @Failure 403 {object} ErrorResponse "Доступ запрещен"
-// @Failure 500 {object} ErrorResponse "Внутренняя ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 401 {object} AuthErrorResponse "Требуется авторизация"
+// @Failure 403 {object} ForbiddenErrorResponse "Доступ запрещен"
+// @Failure 500 {object} InternalErrorResponse "Внутренняя ошибка сервера"
 // @Router /admin/subjects [post]
 func (h *AdminHandler) CreateSubject(c *gin.Context) {
     var req models.CreateSubjectRequest
@@ -157,7 +157,37 @@ func (h *AdminHandler) CreateSubject(c *gin.Context) {
 // ErrorResponse represents error response
 // @Description Стандартный ответ с ошибкой
 type ErrorResponse struct {
+    Error string `json:"error" example:"Error"`
+}
+
+// InvalidParametersErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type WrongParametersErrorResponse struct {
+    Error string `json:"error" example:"Invalid request parameters"`
+}
+
+// AuthErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type AuthErrorResponse struct {
     Error string `json:"error" example:"Authorization header required"`
+}
+
+// ForbiddenErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type ForbiddenErrorResponse struct {
+    Error string `json:"error" example:"Access forbidden"`
+}
+
+// InternalErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InternalErrorResponse struct {
+    Error string `json:"error" example:"Internal server error"`
+}
+
+// UserNotFoundErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type UserNotFoundErrorResponse struct {
+    Error string `json:"error" example:"No such user"`
 }
 
 // SuccessResponse represents success response

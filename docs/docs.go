@@ -40,19 +40,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Требуется авторизация",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.AuthErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Доступ запрещен",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ForbiddenErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -95,27 +95,27 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Требуется авторизация",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.AuthErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Доступ запрещен",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ForbiddenErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -173,19 +173,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Требуется авторизация",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.AuthErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Доступ запрещен",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ForbiddenErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -235,33 +235,33 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверный запрос",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Требуется авторизация",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.AuthErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Доступ запрещен",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ForbiddenErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Пользователь не найден",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.UserNotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -299,15 +299,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -345,21 +345,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Неверные учетные данные",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidDataErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -393,7 +393,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -431,21 +431,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Невалидный токен",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidTokenErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -483,15 +483,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -531,13 +531,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Неверные данные или токен",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidDataOrTokenErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -600,13 +600,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -635,7 +635,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -678,13 +678,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -727,15 +727,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -782,7 +782,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -823,21 +823,27 @@ const docTemplate = `{
                         }
                     },
                     "400": {
+                        "description": "Неверные параметры запроса",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
+                        }
+                    },
+                    "401": {
                         "description": "Неверный ID",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidIDErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Материал не найден",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.MaterialNotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -885,21 +891,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Доступ запрещен",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ForbiddenErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -949,15 +955,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1007,15 +1013,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1072,15 +1078,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1126,15 +1132,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1184,15 +1190,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1237,13 +1243,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Неверный URL",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidURLErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка обработки",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalProcessingErrorResponse"
                         }
                     }
                 }
@@ -1286,13 +1292,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Неверный файл",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidFileErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка загрузки",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalLoadErrorResponse"
                         }
                     }
                 }
@@ -1335,13 +1341,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Неверный файл",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidFileErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка загрузки",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalLoadErrorResponse"
                         }
                     }
                 }
@@ -1375,13 +1381,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Пользователь не найден",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.UserNotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1422,15 +1428,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1473,13 +1479,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Неверный файл",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidFileErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1513,7 +1519,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1563,15 +1569,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1621,15 +1627,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Неверные данные",
+                        "description": "Неверные параметры запроса",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InvalidParametersErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1663,7 +1669,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/handlers.InternalErrorResponse"
                         }
                     }
                 }
@@ -1682,6 +1688,16 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Block added successfully"
+                }
+            }
+        },
+        "handlers.AuthErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Authorization header required"
                 }
             }
         },
@@ -1737,16 +1753,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.ErrorResponse": {
-            "description": "Стандартный ответ с ошибкой",
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Authorization header required"
-                }
-            }
-        },
         "handlers.FavoritesResponse": {
             "description": "Ответ со списком избранных материалов",
             "type": "object",
@@ -1759,6 +1765,116 @@ const docTemplate = `{
                 "total": {
                     "type": "integer",
                     "example": 5
+                }
+            }
+        },
+        "handlers.ForbiddenErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Access forbidden"
+                }
+            }
+        },
+        "handlers.InternalErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Internal server error"
+                }
+            }
+        },
+        "handlers.InternalLoadErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Loading error"
+                }
+            }
+        },
+        "handlers.InternalProcessingErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Processing error"
+                }
+            }
+        },
+        "handlers.InvalidDataErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid data"
+                }
+            }
+        },
+        "handlers.InvalidDataOrTokenErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid token or data"
+                }
+            }
+        },
+        "handlers.InvalidFileErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid file"
+                }
+            }
+        },
+        "handlers.InvalidIDErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid ID"
+                }
+            }
+        },
+        "handlers.InvalidParametersErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request parameters"
+                }
+            }
+        },
+        "handlers.InvalidTokenErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid token"
+                }
+            }
+        },
+        "handlers.InvalidURLErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid URL"
                 }
             }
         },
@@ -1793,6 +1909,16 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Material marked as completed"
+                }
+            }
+        },
+        "handlers.MaterialNotFoundErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Material is not found"
                 }
             }
         },
@@ -2112,6 +2238,16 @@ const docTemplate = `{
                 "url": {
                     "type": "string",
                     "example": "https://example.com/videos/abc123.mp4"
+                }
+            }
+        },
+        "handlers.UserNotFoundErrorResponse": {
+            "description": "Стандартный ответ с ошибкой",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "No such user"
                 }
             }
         },
@@ -2758,9 +2894,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "paydeya-backend.onrender.com",
+	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
-	Schemes:          []string{"https"},
+	Schemes:          []string{"http"},
 	Title:            "Paydeya Education Platform API",
 	Description:      "API для образовательной платформы Пайдея",
 	InfoInstanceName: "swagger",

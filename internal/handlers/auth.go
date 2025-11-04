@@ -25,8 +25,8 @@ func NewAuthHandler(authService *services.AuthService) *AuthHandler {
 // @Produce json
 // @Param input body models.RegisterRequest true "Данные для регистрации"
 // @Success 201 {object} models.AuthResponse "Пользователь создан"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
     var req models.RegisterRequest
@@ -65,9 +65,9 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Produce json
 // @Param input body models.LoginRequest true "Данные для входа"
 // @Success 200 {object} models.AuthResponse "Успешный вход"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 401 {object} ErrorResponse "Неверные учетные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 401 {object} InvalidDataErrorResponse "Неверные учетные данные"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
     var req models.LoginRequest
@@ -106,9 +106,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Produce json
 // @Param input body RefreshTokenRequest true "Refresh токен"
 // @Success 200 {object} models.AuthResponse "Токены обновлены"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 401 {object} ErrorResponse "Невалидный токен"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 401 {object} InvalidTokenErrorResponse "Невалидный токен"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(c *gin.Context) {
     var req RefreshTokenRequest
@@ -139,7 +139,7 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} SuccessResponse "Успешный выход"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /auth/logout [post]
 func (h *AuthHandler) Logout(c *gin.Context) {
     // Пока просто возвращаем успех - в будущем можно добавить blacklist токенов
@@ -156,8 +156,8 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 // @Produce json
 // @Param input body models.ForgotPasswordRequest true "Email для сброса пароля"
 // @Success 200 {object} SuccessResponse "Инструкции отправлены"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /auth/forgot-password [post]
 func (h *AuthHandler) ForgotPassword(c *gin.Context) {
     var req models.ForgotPasswordRequest
@@ -186,8 +186,8 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 // @Produce json
 // @Param input body models.ResetPasswordRequest true "Данные для сброса пароля"
 // @Success 200 {object} SuccessResponse "Пароль изменен"
-// @Failure 400 {object} ErrorResponse "Неверные данные или токен"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidDataOrTokenErrorResponse "Неверные данные или токен"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /auth/reset-password [post]
 func (h *AuthHandler) ResetPassword(c *gin.Context) {
     var req models.ResetPasswordRequest
@@ -212,4 +212,28 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 // @Description Запрос на обновление токенов
 type RefreshTokenRequest struct {
     RefreshToken string `json:"refreshToken" binding:"required" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+}
+
+// InvalidTokenErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InvalidTokenErrorResponse struct {
+    Error string `json:"error" example:"Invalid token"`
+}
+
+// InvalidDataOrTokenErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InvalidDataOrTokenErrorResponse struct {
+    Error string `json:"error" example:"Invalid token or data"`
+}
+
+// InvalidDataErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InvalidDataErrorResponse struct {
+    Error string `json:"error" example:"Invalid data"`
+}
+
+// InvalidParametersErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InvalidParametersErrorResponse struct {
+    Error string `json:"error" example:"Invalid request parameters"`
 }

@@ -25,8 +25,8 @@ func NewMediaHandler(fileService *services.FileService) *MediaHandler {
 // @Security ApiKeyAuth
 // @Param image formData file true "Файл изображения"
 // @Success 200 {object} UploadImageResponse "Изображение загружено"
-// @Failure 400 {object} ErrorResponse "Неверный файл"
-// @Failure 500 {object} ErrorResponse "Ошибка загрузки"
+// @Failure 400 {object} InvalidFileErrorResponse "Неверный файл"
+// @Failure 500 {object} InternalLoadErrorResponse "Ошибка загрузки"
 // @Router /media/images [post]
 func (h *MediaHandler) UploadImage(c *gin.Context) {
     userID := c.GetInt("userID")
@@ -63,8 +63,8 @@ func (h *MediaHandler) UploadImage(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Param video formData file true "Файл видео"
 // @Success 200 {object} UploadVideoResponse "Видео загружено"
-// @Failure 400 {object} ErrorResponse "Неверный файл"
-// @Failure 500 {object} ErrorResponse "Ошибка загрузки"
+// @Failure 400 {object} InvalidFileErrorResponse "Неверный файл"
+// @Failure 500 {object} InternalLoadErrorResponse "Ошибка загрузки"
 // @Router /media/videos [post]
 func (h *MediaHandler) UploadVideo(c *gin.Context) {
     userID := c.GetInt("userID")
@@ -99,8 +99,8 @@ func (h *MediaHandler) UploadVideo(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Param input body EmbedVideoRequest true "URL видео"
 // @Success 200 {object} EmbedVideoResponse "Ссылка для вставки создана"
-// @Failure 400 {object} ErrorResponse "Неверный URL"
-// @Failure 500 {object} ErrorResponse "Ошибка обработки"
+// @Failure 400 {object} InvalidURLErrorResponse "Неверный URL"
+// @Failure 500 {object} InternalProcessingErrorResponse "Ошибка обработки"
 // @Router /media/embed [post]
 func (h *MediaHandler) EmbedVideo(c *gin.Context) {
     var request EmbedVideoRequest
@@ -175,5 +175,29 @@ type EmbedVideoResponse struct {
     OriginalURL  string `json:"originalUrl" example:"https://www.youtube.com/watch?v=abc123"`
     EmbedURL     string `json:"embedUrl" example:"https://www.youtube.com/embed/abc123"`
     Type         string `json:"type" example:"youtube"`
+}
+
+// InvalidFileErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InvalidFileErrorResponse struct {
+    Error string `json:"error" example:"Invalid file"`
+}
+
+// InternalLoadErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InternalLoadErrorResponse struct {
+    Error string `json:"error" example:"Loading error"`
+}
+
+// InvalidURLErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InvalidURLErrorResponse struct {
+    Error string `json:"error" example:"Invalid URL"`
+}
+
+// InternalProcessingErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InternalProcessingErrorResponse struct {
+    Error string `json:"error" example:"Processing error"`
 }
 

@@ -10,6 +10,13 @@ definitions:
         example: Block added successfully
         type: string
     type: object
+  handlers.AuthErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Authorization header required
+        type: string
+    type: object
   handlers.CreateMaterialResponse:
     description: Ответ на создание материала
     properties:
@@ -47,13 +54,6 @@ definitions:
         example: youtube
         type: string
     type: object
-  handlers.ErrorResponse:
-    description: Стандартный ответ с ошибкой
-    properties:
-      error:
-        example: Authorization header required
-        type: string
-    type: object
   handlers.FavoritesResponse:
     description: Ответ со списком избранных материалов
     properties:
@@ -64,6 +64,83 @@ definitions:
       total:
         example: 5
         type: integer
+    type: object
+  handlers.ForbiddenErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Access forbidden
+        type: string
+    type: object
+  handlers.InternalErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Internal server error
+        type: string
+    type: object
+  handlers.InternalLoadErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Loading error
+        type: string
+    type: object
+  handlers.InternalProcessingErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Processing error
+        type: string
+    type: object
+  handlers.InvalidDataErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Invalid data
+        type: string
+    type: object
+  handlers.InvalidDataOrTokenErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Invalid token or data
+        type: string
+    type: object
+  handlers.InvalidFileErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Invalid file
+        type: string
+    type: object
+  handlers.InvalidIDErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Invalid ID
+        type: string
+    type: object
+  handlers.InvalidParametersErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Invalid request parameters
+        type: string
+    type: object
+  handlers.InvalidTokenErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Invalid token
+        type: string
+    type: object
+  handlers.InvalidURLErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Invalid URL
+        type: string
     type: object
   handlers.MarkCompleteRequest:
     description: Запрос на отметку материала как завершенного
@@ -88,6 +165,13 @@ definitions:
         type: integer
       message:
         example: Material marked as completed
+        type: string
+    type: object
+  handlers.MaterialNotFoundErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: Material is not found
         type: string
     type: object
   handlers.MaterialsResponse:
@@ -315,6 +399,13 @@ definitions:
         type: integer
       url:
         example: https://example.com/videos/abc123.mp4
+        type: string
+    type: object
+  handlers.UserNotFoundErrorResponse:
+    description: Стандартный ответ с ошибкой
+    properties:
+      error:
+        example: No such user
         type: string
     type: object
   handlers.UsersListResponse:
@@ -743,7 +834,7 @@ definitions:
         example: 123
         type: integer
     type: object
-host: paydeya-backend.onrender.com
+host: localhost:8080
 info:
   contact: {}
   description: API для образовательной платформы Пайдея
@@ -764,15 +855,15 @@ paths:
         "401":
           description: Требуется авторизация
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.AuthErrorResponse'
         "403":
           description: Доступ запрещен
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ForbiddenErrorResponse'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Получить статистику платформы
@@ -798,21 +889,21 @@ paths:
           schema:
             $ref: '#/definitions/handlers.SuccessResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "401":
           description: Требуется авторизация
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.AuthErrorResponse'
         "403":
           description: Доступ запрещен
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ForbiddenErrorResponse'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Создать предмет
@@ -850,15 +941,15 @@ paths:
         "401":
           description: Требуется авторизация
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.AuthErrorResponse'
         "403":
           description: Доступ запрещен
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ForbiddenErrorResponse'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Получить список пользователей
@@ -889,25 +980,25 @@ paths:
           schema:
             $ref: '#/definitions/handlers.SuccessResponse'
         "400":
-          description: Неверный запрос
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "401":
           description: Требуется авторизация
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.AuthErrorResponse'
         "403":
           description: Доступ запрещен
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ForbiddenErrorResponse'
         "404":
           description: Пользователь не найден
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.UserNotFoundErrorResponse'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Заблокировать пользователя
@@ -933,13 +1024,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.SuccessResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       summary: Запрос сброса пароля
       tags:
       - auth
@@ -963,17 +1054,17 @@ paths:
           schema:
             $ref: '#/definitions/models.AuthResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "401":
           description: Неверные учетные данные
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidDataErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       summary: Вход в систему
       tags:
       - auth
@@ -992,7 +1083,7 @@ paths:
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Выход из системы
@@ -1018,17 +1109,17 @@ paths:
           schema:
             $ref: '#/definitions/models.AuthResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "401":
           description: Невалидный токен
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidTokenErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       summary: Обновление токенов
       tags:
       - auth
@@ -1052,13 +1143,13 @@ paths:
           schema:
             $ref: '#/definitions/models.AuthResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       summary: Регистрация пользователя
       tags:
       - auth
@@ -1084,11 +1175,11 @@ paths:
         "400":
           description: Неверные данные или токен
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidDataOrTokenErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       summary: Сброс пароля
       tags:
       - auth
@@ -1130,11 +1221,11 @@ paths:
         "400":
           description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       summary: Поиск материалов в каталоге
       tags:
       - catalog
@@ -1153,7 +1244,7 @@ paths:
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       summary: Получить список предметов
       tags:
       - catalog
@@ -1181,11 +1272,11 @@ paths:
         "400":
           description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       summary: Поиск преподавателей
       tags:
       - catalog
@@ -1209,13 +1300,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.CreateMaterialResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Создать материал
@@ -1240,17 +1331,21 @@ paths:
           schema:
             $ref: '#/definitions/models.Material'
         "400":
+          description: Неверные параметры запроса
+          schema:
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
+        "401":
           description: Неверный ID
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidIDErrorResponse'
         "404":
           description: Материал не найден
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.MaterialNotFoundErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Получить материал
@@ -1280,17 +1375,17 @@ paths:
           schema:
             $ref: '#/definitions/handlers.SuccessResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "403":
           description: Доступ запрещен
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.ForbiddenErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Обновить материал
@@ -1321,13 +1416,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.AddBlockResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Добавить блок
@@ -1357,13 +1452,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.SuccessResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Удалить блок
@@ -1398,13 +1493,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.SuccessResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Обновить блок
@@ -1435,13 +1530,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.ReorderBlocksResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Изменить порядок блоков
@@ -1472,13 +1567,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.PublishMaterialResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Опубликовать материал
@@ -1508,7 +1603,7 @@ paths:
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Получить материалы пользователя
@@ -1536,11 +1631,11 @@ paths:
         "400":
           description: Неверный URL
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidURLErrorResponse'
         "500":
           description: Ошибка обработки
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalProcessingErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Вставить видео по ссылке
@@ -1567,11 +1662,11 @@ paths:
         "400":
           description: Неверный файл
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidFileErrorResponse'
         "500":
           description: Ошибка загрузки
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalLoadErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Загрузить изображение
@@ -1598,11 +1693,11 @@ paths:
         "400":
           description: Неверный файл
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidFileErrorResponse'
         "500":
           description: Ошибка загрузки
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalLoadErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Загрузить видео
@@ -1623,11 +1718,11 @@ paths:
         "404":
           description: Пользователь не найден
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.UserNotFoundErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Получить профиль пользователя
@@ -1652,13 +1747,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.UpdateProfileResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Обновить профиль
@@ -1685,11 +1780,11 @@ paths:
         "400":
           description: Неверный файл
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidFileErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Загрузить аватар
@@ -1710,7 +1805,7 @@ paths:
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Получить избранные материалы
@@ -1741,13 +1836,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.MarkCompleteResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Отметить материал как завершенный
@@ -1778,13 +1873,13 @@ paths:
           schema:
             $ref: '#/definitions/handlers.ToggleFavoriteResponse'
         "400":
-          description: Неверные данные
+          description: Неверные параметры запроса
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InvalidParametersErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Добавить/удалить из избранного
@@ -1805,14 +1900,14 @@ paths:
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/handlers.InternalErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Получить прогресс обучения
       tags:
       - progress
 schemes:
-- https
+- http
 securityDefinitions:
   ApiKeyAuth:
     description: 'Введите: Bearer {token}'
