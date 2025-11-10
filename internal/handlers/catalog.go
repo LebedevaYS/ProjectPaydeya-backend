@@ -2,6 +2,7 @@ package handlers
 
 import (
     "net/http"
+    "log"
 
     "paydeya-backend/internal/models"
     "paydeya-backend/internal/services"
@@ -25,12 +26,10 @@ func NewCatalogHandler(catalogService *services.CatalogService) *CatalogHandler 
 // @Produce json
 // @Param search query string false "Поисковый запрос"
 // @Param subject query string false "Фильтр по предмету"
-// @Param level query string false "Фильтр по уровню сложности"
 // @Param page query int false "Номер страницы" default(1)
 // @Param limit query int false "Количество материалов на странице" default(20)
 // @Success 200 {object} MaterialsResponse "Список материалов"
-// @Failure 400 {object} ErrorResponse "Неверные параметры запроса"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 500 {object} Error500Response "Ошибка сервера"
 // @Router /catalog/materials [get]
 func (h *CatalogHandler) SearchMaterials(c *gin.Context) {
     var filters models.CatalogFilters
@@ -71,7 +70,7 @@ func (h *CatalogHandler) SearchMaterials(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} SubjectsResponse "Список предметов"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 500 {object} Error500Response "Ошибка сервера"
 // @Router /catalog/subjects [get]
 func (h *CatalogHandler) GetSubjects(c *gin.Context) {
     subjects, err := h.catalogService.GetSubjects(c.Request.Context())
@@ -94,8 +93,7 @@ func (h *CatalogHandler) GetSubjects(c *gin.Context) {
 // @Param search query string false "Поисковый запрос"
 // @Param subject query string false "Фильтр по предмету"
 // @Success 200 {object} TeachersResponse "Список преподавателей"
-// @Failure 400 {object} ErrorResponse "Неверные параметры запроса"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 500 {object} Error500Response "Ошибка сервера"
 // @Router /catalog/teachers [get]
 func (h *CatalogHandler) SearchTeachers(c *gin.Context) {
     var filters models.TeacherFilters
@@ -104,13 +102,15 @@ func (h *CatalogHandler) SearchTeachers(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
+    log.Printf("SearchTeachers called with filters: %+v", filters)
 
     teachers, err := h.catalogService.SearchTeachers(c.Request.Context(), filters)
     if err != nil {
+        log.Printf("SearchTeachers error: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search teachers"})
         return
     }
-
+    log.Printf("SearchTeachers: found %d teachers", len(teachers))
     c.JSON(http.StatusOK, gin.H{
         "teachers": teachers,
     })
@@ -138,5 +138,10 @@ type SubjectsResponse struct {
 // @Description Ответ с результатами поиска преподавателей
 type TeachersResponse struct {
     Teachers []models.Teacher `json:"teachers"`
+}
+// Error500Response represents error response
+// @Description Стандартный ответ с ошибкой
+type Error500Response struct {
+    Error string `json:"error" example:"Server error"`
 }
 
