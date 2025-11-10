@@ -1,8 +1,8 @@
--- Таблица материалов
+﻿-- Таблица материалов
 CREATE TABLE IF NOT EXISTS materials (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(500) NOT NULL,
-    subject VARCHAR(100) NOT NULL,
+    title VARCHAR(1000) NOT NULL,
+    subject VARCHAR(200) NOT NULL,
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     status VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
     access VARCHAR(20) NOT NULL DEFAULT 'open' CHECK (access IN ('open', 'link')),
