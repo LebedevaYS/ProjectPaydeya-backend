@@ -1,4 +1,4 @@
-﻿-- migrations/006_sample_data_extended.sql
+-- migrations/006_sample_data_extended.sql
 SET client_encoding = 'UTF8';
 
 -- Очистка данных в правильном порядке
