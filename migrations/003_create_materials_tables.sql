@@ -1,4 +1,4 @@
-﻿-- Таблица материалов
+-- Таблица материалов
 CREATE TABLE IF NOT EXISTS materials (
     id SERIAL PRIMARY KEY,
     title VARCHAR(1000) NOT NULL,

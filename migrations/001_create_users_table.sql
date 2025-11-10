@@ -1,4 +1,4 @@
-﻿-- migrations/001_create_users_table.sql
+-- migrations/001_create_users_table.sql
 
 -- Таблица пользователей (основная)
 CREATE TABLE IF NOT EXISTS users (
