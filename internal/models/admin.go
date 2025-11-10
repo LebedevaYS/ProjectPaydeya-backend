@@ -19,7 +19,9 @@ type UserManagement struct {
     FullName  string    `json:"fullName"`
     Role      string    `json:"role"`
     IsVerified bool     `json:"isVerified"`
-    CreatedAt time.Time `json:"createdAt"` // ← Измените на time.Time
+    IsBlocked bool      `json:"isBlocked" example:"false"`
+    BlockReason *string  `json:"blockReason,omitempty" example:"Нарушение правил"`
+    CreatedAt time.Time `json:"createdAt"`
     MaterialsCount int  `json:"materialsCount"`
 }
 

@@ -7,6 +7,11 @@ import (
     "strconv"
     "fmt"
     _ "paydeya-backend/docs"
+    "time"  // ← ДОБАВЬТЕ ЭТОТ
+    "github.com/gin-contrib/cors"  // ← ДОБАВЬТЕ ЭТОТ
+    "github.com/gin-gonic/gin"
+    "github.com/swaggo/files"      // ← ДОБАВЬТЕ ЭТОТ
+    ginSwagger "github.com/swaggo/gin-swagger"
 
     "paydeya-backend/internal/database"
     "paydeya-backend/internal/handlers"
@@ -15,7 +20,6 @@ import (
     "paydeya-backend/internal/middleware"
 
 
-    "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
 )
 
@@ -65,8 +69,15 @@ func runMigrations() error {
 // @title Paydeya Education Platform API
 // @version 1.0
 // @description API для образовательной платформы Пайдея
-// @host localhost:8080
 // @BasePath /api/v1
+
+// Для разработки:
+// host localhost:8080
+// schemes http
+
+// Для продакшена (закомментировать выше и раскомментировать ниже):
+// @host paydeya-backend.onrender.com
+// @schemes https
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
@@ -81,7 +92,7 @@ func runMigrations() error {
 // @tag.description Авторизация и работа с паролями
 // @tag.name materials
 // @tag.description Управление учебными материалами
-// @tag.name progress
+// @tag.name student
 // @tag.description Отслеживание прогресса обучения и избранное
 // @tag.name profile
 // @tag.description Управление профилем пользователя
@@ -159,21 +170,16 @@ func main() {
         gin.SetMode(gin.ReleaseMode)
     }
 
+    // CORS middleware
     router := gin.Default()
 
-    // CORS middleware
-    router.Use(func(c *gin.Context) {
-        c.Header("Access-Control-Allow-Origin", "*")
-        c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
-
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
-
-        c.Next()
-    })
+    config := cors.DefaultConfig()
+    config.AllowAllOrigins = true
+    config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"}
+    config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"}
+    config.AllowCredentials = true
+    config.MaxAge = 12 * time.Hour
+    router.Use(cors.New(config))
 
     router.GET("/debug/routes", func(c *gin.Context) {
         routes := router.Routes()
@@ -209,7 +215,7 @@ func main() {
         protected.POST("/profile/avatar", profileHandler.UploadAvatar)
 
         protected.POST("/materials", materialHandler.CreateMaterial)
-        protected.GET("/materials", materialHandler.GetUserMaterials)
+        protected.GET("/materials/my", materialHandler.GetUserMaterials)
         protected.GET("/materials/:id", materialHandler.GetMaterial)
         protected.PUT("/materials/:id", materialHandler.UpdateMaterial)
         protected.POST("/materials/:id/publish", materialHandler.PublishMaterial)
@@ -251,6 +257,13 @@ func main() {
         c.Header("Content-Type", "application/json; charset=utf-8") // ← ДОБАВЬТЕ ЭТУ СТРОЧКУ
         c.File("./docs/swagger.json")
     })
+
+    //router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger.json")))
+
+    router.GET("/docs/*any", ginSwagger.WrapHandler(
+        swaggerFiles.Handler,
+        ginSwagger.URL("https://paydeya-backend.onrender.com/swagger.json"), // ← ДОБАВЬТЕ ЭТОТ ПАРАМЕТР
+    ))
 
     router.GET("/docs", func(c *gin.Context) {
         html := `<!DOCTYPE html>

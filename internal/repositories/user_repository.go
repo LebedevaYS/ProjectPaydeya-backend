@@ -37,22 +37,25 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) erro
 // GetUserByEmail возвращает пользователя по email
 func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
     var user models.User
+    var blockReason *string
 
     query := `
-        SELECT id, email, password_hash, full_name, role, avatar_url, is_verified, created_at, updated_at
+        SELECT id, email, password_hash, full_name, role, avatar_url, is_verified, is_blocked, block_reason, created_at, updated_at
         FROM users
         WHERE email = $1
     `
 
     err := r.db.QueryRow(ctx, query, email).Scan(
-        &user.ID, &user.Email, &user.PasswordHash, &user.FullName, &user.Role,
-        &user.AvatarURL, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt,
+           &user.ID, &user.Email, &user.PasswordHash, &user.FullName, &user.Role,
+           &user.AvatarURL, &user.IsVerified, &user.IsBlocked, &blockReason,
+           &user.CreatedAt, &user.UpdatedAt,
     )
 
     if err == pgx.ErrNoRows {
         return nil, nil
     }
 
+    user.BlockReason = blockReason
     return &user, err
 }
 

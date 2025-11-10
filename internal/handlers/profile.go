@@ -73,7 +73,7 @@ func (h *ProfileHandler) GetProfile(c *gin.Context) {
 
 // UpdateProfile godoc
 // @Summary Обновить профиль
-// @Description Обновляет данные профиля пользователя. Для учителей также обновляются специализации
+// @Description Обновляет данные профиля пользователя
 // @Tags profile
 // @Accept json
 // @Produce json
@@ -82,7 +82,7 @@ func (h *ProfileHandler) GetProfile(c *gin.Context) {
 // @Success 200 {object} UpdateProfileResponse "Профиль обновлен"
 // @Failure 400 {object} ErrorResponse "Неверные данные"
 // @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /profile [patch]
+// @Router /profile [put]
 func (h *ProfileHandler) UpdateProfile(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -183,7 +183,7 @@ type ProfileResponse struct {
 }
 
 // UpdateProfileRequest represents update profile request
-// @Description Запрос на обновление профиля. Поле specializations учитывается только для учителей
+// @Description Запрос на обновление профиля
 type UpdateProfileRequest struct {
     FullName        string   `json:"fullName" example:"Иван Иванов"`
     Specializations []string `json:"specializations" example:"math,physics"`

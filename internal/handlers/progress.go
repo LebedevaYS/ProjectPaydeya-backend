@@ -25,8 +25,8 @@ func NewProgressHandler(progressService *services.ProgressService) *ProgressHand
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} models.StudentProgress "Прогресс обучения"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /progress [get]
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
+// @Router /student/progress [get]
 func (h *ProgressHandler) GetProgress(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -49,9 +49,9 @@ func (h *ProgressHandler) GetProgress(c *gin.Context) {
 // @Param id path int true "ID материала"
 // @Param input body MarkCompleteRequest true "Данные завершения"
 // @Success 200 {object} MarkCompleteResponse "Материал отмечен как завершенный"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /progress/materials/{id}/complete [post]
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
+// @Router /student/materials/{id}/complete [post]
 func (h *ProgressHandler) MarkMaterialComplete(c *gin.Context) {
     userID := c.GetInt("userID")
     materialID, err := strconv.Atoi(c.Param("id"))
@@ -86,8 +86,8 @@ func (h *ProgressHandler) MarkMaterialComplete(c *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} FavoritesResponse "Список избранных материалов"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /progress/favorites [get]
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
+// @Router /student/favorites [get]
 func (h *ProgressHandler) GetFavorites(c *gin.Context) {
     userID := c.GetInt("userID")
 
@@ -113,9 +113,9 @@ func (h *ProgressHandler) GetFavorites(c *gin.Context) {
 // @Param id path int true "ID материала"
 // @Param input body ToggleFavoriteRequest true "Действие с избранным"
 // @Success 200 {object} ToggleFavoriteResponse "Статус избранного обновлен"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /progress/favorites/{id} [post]
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
+// @Router /student/materials/{id}/favorite [post]
 func (h *ProgressHandler) ToggleFavorite(c *gin.Context) {
     userID := c.GetInt("userID")
     materialID, err := strconv.Atoi(c.Param("id"))

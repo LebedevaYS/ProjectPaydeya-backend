@@ -76,6 +76,14 @@ func (s *AuthService) Login(ctx context.Context, req *models.LoginRequest) (*mod
         return nil, errors.New("invalid email or password")
     }
 
+    if user.IsBlocked {
+        reason := "No reason provided"
+        if user.BlockReason != nil {
+            reason = *user.BlockReason
+        }
+        return nil, fmt.Errorf("account is blocked. Reason: %s", reason)
+    }
+
     return user, nil
 }
 

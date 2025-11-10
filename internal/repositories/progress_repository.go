@@ -100,7 +100,7 @@ func (r *ProgressRepository) GetFavoriteMaterials(ctx context.Context, userID in
         JOIN users u ON m.author_id = u.id
         JOIN favorite_materials fm ON m.id = fm.material_id
         WHERE fm.user_id = $1 AND m.status = 'published'
-        ORDER BY fm.added_at DESC
+        ORDER BY fm.created_at DESC
     `
 
     rows, err := r.db.Query(ctx, query, userID)

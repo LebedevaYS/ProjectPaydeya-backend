@@ -570,6 +570,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "string",
+                        "description": "Фильтр по уровню сложности",
+                        "name": "level",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "default": 1,
                         "description": "Номер страницы",
@@ -591,10 +597,16 @@ const docTemplate = `{
                             "$ref": "#/definitions/handlers.MaterialsResponse"
                         }
                     },
+                    "400": {
+                        "description": "Неверные параметры запроса",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.Error500Response"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -623,7 +635,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.Error500Response"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -663,10 +675,16 @@ const docTemplate = `{
                             "$ref": "#/definitions/handlers.TeachersResponse"
                         }
                     },
+                    "400": {
+                        "description": "Неверные параметры запроса",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/handlers.Error500Response"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -1363,13 +1381,13 @@ const docTemplate = `{
                     }
                 }
             },
-            "patch": {
+            "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Обновляет данные профиля пользователя. Для учителей также обновляются специализации",
+                "description": "Обновляет данные профиля пользователя",
                 "consumes": [
                     "application/json"
                 ],
@@ -1714,16 +1732,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.Error500Response": {
-            "description": "Стандартный ответ с ошибкой",
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Server error"
-                }
-            }
-        },
         "handlers.ErrorResponse": {
             "description": "Стандартный ответ с ошибкой",
             "type": "object",
@@ -2000,7 +2008,7 @@ const docTemplate = `{
             }
         },
         "handlers.UpdateProfileRequest": {
-            "description": "Запрос на обновление профиля. Поле specializations учитывается только для учителей",
+            "description": "Запрос на обновление профиля",
             "type": "object",
             "properties": {
                 "fullName": {

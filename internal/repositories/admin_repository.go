@@ -66,7 +66,7 @@ func (r *AdminRepository) GetUsers(ctx context.Context, role string, page, limit
 
     // Базовый запрос
     baseQuery := `
-        SELECT u.id, u.email, u.full_name, u.role, u.is_verified, u.created_at,
+        SELECT u.id, u.email, u.full_name, u.role, u.is_verified, u.is_blocked, u.block_reason, u.created_at,
                COUNT(m.id) as materials_count
         FROM users u
         LEFT JOIN materials m ON u.id = m.author_id
@@ -86,7 +86,7 @@ func (r *AdminRepository) GetUsers(ctx context.Context, role string, page, limit
         baseQuery += " WHERE " + strings.Join(conditions, " AND ")
     }
 
-    baseQuery += " GROUP BY u.id, u.email, u.full_name, u.role, u.is_verified, u.created_at"
+    baseQuery += " GROUP BY u.id, u.email, u.full_name, u.role, u.is_verified, u.is_blocked, u.block_reason, u.created_at"
 
     // Получаем общее количество
     countQuery := "SELECT COUNT(*) FROM (" + baseQuery + ") as filtered"
@@ -124,7 +124,7 @@ func (r *AdminRepository) GetUsers(ctx context.Context, role string, page, limit
 
         err := rows.Scan(
             &user.ID, &user.Email, &user.FullName, &user.Role,
-            &user.IsVerified, &user.CreatedAt, &user.MaterialsCount, // ← сканируем прямо в time.Time поле
+            &user.IsVerified, &user.IsBlocked, &user.BlockReason, &user.CreatedAt, &user.MaterialsCount, // ← сканируем прямо в time.Time поле
         )
         if err != nil {
             return nil, 0, err
@@ -137,10 +137,8 @@ func (r *AdminRepository) GetUsers(ctx context.Context, role string, page, limit
 
 // BlockUser блокирует пользователя
 func (r *AdminRepository) BlockUser(ctx context.Context, userID int, reason string) error {
-    // В реальности нужно добавить поле is_blocked в таблицу users
-    // Сейчас просто логируем действие
-    query := `UPDATE users SET is_verified = false WHERE id = $1`
-    _, err := r.db.Exec(ctx, query, userID)
+    query := `UPDATE users SET is_blocked = true, block_reason = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`
+    _, err := r.db.Exec(ctx, query, reason, userID)
     return err
 }
 

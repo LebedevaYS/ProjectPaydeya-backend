@@ -47,13 +47,6 @@ definitions:
         example: youtube
         type: string
     type: object
-  handlers.Error500Response:
-    description: Стандартный ответ с ошибкой
-    properties:
-      error:
-        example: Server error
-        type: string
-    type: object
   handlers.ErrorResponse:
     description: Стандартный ответ с ошибкой
     properties:
@@ -251,8 +244,7 @@ definitions:
         type: string
     type: object
   handlers.UpdateProfileRequest:
-    description: Запрос на обновление профиля. Поле specializations учитывается только
-      для учителей
+    description: Запрос на обновление профиля
     properties:
       fullName:
         example: Иван Иванов
@@ -1105,6 +1097,10 @@ paths:
         in: query
         name: subject
         type: string
+      - description: Фильтр по уровню сложности
+        in: query
+        name: level
+        type: string
       - default: 1
         description: Номер страницы
         in: query
@@ -1122,10 +1118,14 @@ paths:
           description: Список материалов
           schema:
             $ref: '#/definitions/handlers.MaterialsResponse'
+        "400":
+          description: Неверные параметры запроса
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.Error500Response'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Поиск материалов в каталоге
       tags:
       - catalog
@@ -1144,7 +1144,7 @@ paths:
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.Error500Response'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Получить список предметов
       tags:
       - catalog
@@ -1169,10 +1169,14 @@ paths:
           description: Список преподавателей
           schema:
             $ref: '#/definitions/handlers.TeachersResponse'
+        "400":
+          description: Неверные параметры запроса
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/handlers.Error500Response'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Поиск преподавателей
       tags:
       - catalog
@@ -1618,11 +1622,10 @@ paths:
       summary: Получить профиль пользователя
       tags:
       - profile
-    patch:
+    put:
       consumes:
       - application/json
-      description: Обновляет данные профиля пользователя. Для учителей также обновляются
-        специализации
+      description: Обновляет данные профиля пользователя
       parameters:
       - description: Данные для обновления
         in: body

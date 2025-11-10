@@ -29,8 +29,8 @@ func NewMaterialHandler(materialService *services.MaterialService) *MaterialHand
 // @Security ApiKeyAuth
 // @Param input body models.CreateMaterialRequest true "Данные материала"
 // @Success 201 {object} CreateMaterialResponse "Материал создан"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /materials [post]
 func (h *MaterialHandler) CreateMaterial(c *gin.Context) {
     userID := c.GetInt("userID")
@@ -60,11 +60,13 @@ func (h *MaterialHandler) CreateMaterial(c *gin.Context) {
 // @Tags materials
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path int true "ID материала"
 // @Success 200 {object} models.Material "Материал"
-// @Failure 400 {object} ErrorResponse "Неверный ID"
-// @Failure 404 {object} ErrorResponse "Материал не найден"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 401 {object} InvalidIDErrorResponse "Неверный ID"
+// @Failure 404 {object} MaterialNotFoundErrorResponse "Материал не найден"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /materials/{id} [get]
 func (h *MaterialHandler) GetMaterial(c *gin.Context) {
     materialID, err := strconv.Atoi(c.Param("id"))
@@ -97,9 +99,9 @@ func (h *MaterialHandler) GetMaterial(c *gin.Context) {
 // @Param id path int true "ID материала"
 // @Param input body models.UpdateMaterialRequest true "Данные для обновления"
 // @Success 200 {object} SuccessResponse "Материал обновлен"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 403 {object} ErrorResponse "Доступ запрещен"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 403 {object} ForbiddenErrorResponse "Доступ запрещен"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /materials/{id} [put]
 func (h *MaterialHandler) UpdateMaterial(c *gin.Context) {
     userID := c.GetInt("userID")
@@ -138,20 +140,25 @@ func (h *MaterialHandler) UpdateMaterial(c *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param status query string false "Фильтр по статусу" Enums(draft, published, archived)
-// @Success 200 {object} UserMaterialsResponse "Материалы пользователя"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Success 200 {object} models.UserMaterialsResponse "Материалы пользователя"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /materials/my [get]
 func (h *MaterialHandler) GetUserMaterials(c *gin.Context) {
-    userID := c.GetInt("userID")
-    status := c.Query("status") // draft, published, archived
+     userID := c.GetInt("userID")
+        status := c.Query("status") // draft, published, archived
 
-    // TODO: реализовать в сервисе
-    c.JSON(http.StatusOK, gin.H{
-        "message": "User materials endpoint",
-        "userID":  userID,
-        "status":  status,
-        "materials": []string{}, // заглушка
-    })
+        materials, err := h.materialService.GetUserMaterials(c.Request.Context(), userID, status)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user materials"})
+            return
+        }
+
+        c.JSON(http.StatusOK, gin.H{
+            "materials": materials,
+            "total":     len(materials),
+            "userID":    userID,
+            "status":    status,
+        })
 }
 
 // PublishMaterial godoc
@@ -164,8 +171,8 @@ func (h *MaterialHandler) GetUserMaterials(c *gin.Context) {
 // @Param id path int true "ID материала"
 // @Param input body models.PublishMaterialRequest true "Настройки публикации"
 // @Success 200 {object} PublishMaterialResponse "Материал опубликован"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /materials/{id}/publish [post]
 func (h *MaterialHandler) PublishMaterial(c *gin.Context) {
     userID := c.GetInt("userID")
@@ -213,8 +220,8 @@ func (h *MaterialHandler) PublishMaterial(c *gin.Context) {
 // @Param id path int true "ID материала"
 // @Param input body models.Block true "Данные блока"
 // @Success 200 {object} AddBlockResponse "Блок добавлен"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /materials/{id}/blocks [post]
 func (h *MaterialHandler) AddBlock(c *gin.Context) {
     userID := c.GetInt("userID")
@@ -253,8 +260,8 @@ func (h *MaterialHandler) AddBlock(c *gin.Context) {
 // @Param blockId path string true "ID блока"
 // @Param input body models.Block true "Данные блока"
 // @Success 200 {object} SuccessResponse "Блок обновлен"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /materials/{id}/blocks/{blockId} [put]
 func (h *MaterialHandler) UpdateBlock(c *gin.Context) {
     userID := c.GetInt("userID")
@@ -295,8 +302,8 @@ func (h *MaterialHandler) UpdateBlock(c *gin.Context) {
 // @Param id path int true "ID материала"
 // @Param blockId path string true "ID блока"
 // @Success 200 {object} SuccessResponse "Блок удален"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
 // @Router /materials/{id}/blocks/{blockId} [delete]
 func (h *MaterialHandler) DeleteBlock(c *gin.Context) {
     userID := c.GetInt("userID")
@@ -329,9 +336,9 @@ func (h *MaterialHandler) DeleteBlock(c *gin.Context) {
 // @Param id path int true "ID материала"
 // @Param input body ReorderBlocksRequest true "Новый порядок блоков"
 // @Success 200 {object} ReorderBlocksResponse "Порядок изменен"
-// @Failure 400 {object} ErrorResponse "Неверные данные"
-// @Failure 500 {object} ErrorResponse "Ошибка сервера"
-// @Router /materials/{id}/reorder [put]
+// @Failure 400 {object} InvalidParametersErrorResponse "Неверные параметры запроса"
+// @Failure 500 {object} InternalErrorResponse "Ошибка сервера"
+// @Router /materials/{id}/blocks/reorder [post]
 func (h *MaterialHandler) ReorderBlocks(c *gin.Context) {
     userID := c.GetInt("userID")
     materialID, err := strconv.Atoi(c.Param("id"))
@@ -357,6 +364,7 @@ func (h *MaterialHandler) ReorderBlocks(c *gin.Context) {
         "newOrder": req.Blocks,
     })
 }
+
 
 // Вспомогательная функция для генерации хеша
 func generateUniqueHash() string {
@@ -410,4 +418,16 @@ type ReorderBlocksRequest struct {
 type ReorderBlocksResponse struct {
     Message  string   `json:"message" example:"Blocks reordered successfully"`
     NewOrder []string `json:"newOrder" example:"block_1,block_2,block_3"`
+}
+
+// InvalidIDErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type InvalidIDErrorResponse struct {
+    Error string `json:"error" example:"Invalid ID"`
+}
+
+// MaterialNotFoundErrorResponse represents error response
+// @Description Стандартный ответ с ошибкой
+type MaterialNotFoundErrorResponse struct {
+    Error string `json:"error" example:"Material is not found"`
 }

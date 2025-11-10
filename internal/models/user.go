@@ -13,6 +13,8 @@ type User struct {
     Role         string    `json:"role"`
     AvatarURL    string    `json:"avatarUrl,omitempty"`
     IsVerified   bool      `json:"isVerified"`
+    IsBlocked    bool      `json:"isBlocked"`
+    BlockReason  *string    `json:"blockReason,omitempty"`
     CreatedAt    time.Time `json:"createdAt"`
     UpdatedAt    time.Time `json:"updatedAt"`
 }
