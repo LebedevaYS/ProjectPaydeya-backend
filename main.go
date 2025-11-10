@@ -47,6 +47,7 @@ func runMigrations() error {
         "migrations/003_create_materials_tables.sql",
         "migrations/004_add_ratings_table.sql",
         "migrations/005_create_progress_tables.sql",
+        "migrations/006_sample_data.sql"
     }
 
     for _, file := range migrationFiles {
